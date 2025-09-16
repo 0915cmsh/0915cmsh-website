@@ -99,12 +99,16 @@ export default function AdminDashboard() {
   };
 
   const getTypeLabel = (type: string) => {
-    switch (type) {
-      case 'corporate': return '기업문의';
-      case 'jobseeker': return '구직자문의';
-      case 'employee': return '재직자문의';
-      default: return type;
-    }
+    const typeMapping: { [key: string]: string } = {
+      'employee': '직원 문의',
+      'corporate': '기업 문의',
+      'jobseeker': '구직자 문의',
+      'dispatch': '파견 문의',
+      'outsourcing': '아웃소싱 문의',
+      'headhunting': '헤드헌팅 문의',
+      'rpo': 'RPO 문의'
+    };
+    return typeMapping[type] || type || '일반';
   };
 
   const getStatusLabel = (inquiry: Inquiry) => {

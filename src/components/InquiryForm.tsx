@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface InquiryFormProps {
-  type: 'corporate' | 'jobseeker' | 'employee';
+  type: 'corporate' | 'jobseeker' | 'employee' | 'dispatch' | 'outsourcing' | 'headhunting' | 'rpo';
 }
 
 export default function InquiryForm({ type }: InquiryFormProps) {
@@ -66,12 +66,16 @@ export default function InquiryForm({ type }: InquiryFormProps) {
   };
 
   const getTypeLabel = () => {
-    switch (type) {
-      case 'corporate': return '기업 문의';
-      case 'jobseeker': return '구직자 문의';
-      case 'employee': return '재직자 문의';
-      default: return '문의';
-    }
+    const typeMapping: { [key: string]: string } = {
+      'employee': '직원 문의',
+      'corporate': '기업 문의',
+      'jobseeker': '구직자 문의',
+      'dispatch': '파견 문의',
+      'outsourcing': '아웃소싱 문의',
+      'headhunting': '헤드헌팅 문의',
+      'rpo': 'RPO 문의'
+    };
+    return typeMapping[type] || '일반 문의';
   };
 
   return (
@@ -81,7 +85,13 @@ export default function InquiryForm({ type }: InquiryFormProps) {
         <div className="text-center mb-12">
           <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-2xl p-8 mb-8 shadow-xl">
             <div className="text-6xl mb-4">
-              {type === 'corporate' ? '🏢' : type === 'jobseeker' ? '👤' : '💼'}
+              {type === 'corporate' ? '🏢' : 
+               type === 'jobseeker' ? '👤' : 
+               type === 'employee' ? '💼' :
+               type === 'dispatch' ? '🚚' :
+               type === 'outsourcing' ? '🏭' :
+               type === 'headhunting' ? '🎯' :
+               type === 'rpo' ? '📋' : '📝'}
             </div>
             <h1 className="text-3xl md:text-4xl font-bold mb-4">{getTypeLabel()}</h1>
             <p className="text-xl text-blue-100">
@@ -89,7 +99,17 @@ export default function InquiryForm({ type }: InquiryFormProps) {
                 ? '전문적인 인력 솔루션으로 비즈니스 성장을 지원합니다'
                 : type === 'jobseeker'
                 ? '나에게 맞는 최적의 기회를 찾아보세요'
-                : '안정적인 근무 환경에서 전문성을 발휘하세요'
+                : type === 'employee'
+                ? '안정적인 근무 환경에서 전문성을 발휘하세요'
+                : type === 'dispatch'
+                ? '유연한 파견 서비스로 업무 효율성을 높이세요'
+                : type === 'outsourcing'
+                ? '전문 아웃소싱 서비스로 비용을 절감하세요'
+                : type === 'headhunting'
+                ? '최고의 인재를 찾아드립니다'
+                : type === 'rpo'
+                ? '체계적인 채용 프로세스로 인재를 확보하세요'
+                : '전문적인 서비스로 도움을 드립니다'
               }
             </p>
           </div>

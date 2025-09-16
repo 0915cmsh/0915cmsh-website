@@ -23,6 +23,19 @@ export default function InquiryBoard() {
   const [total, setTotal] = useState(0);
   const pageSize = 10;
 
+  const getTypeLabel = (type: string) => {
+    const typeMapping: { [key: string]: string } = {
+      'employee': '직원 문의',
+      'corporate': '기업 문의',
+      'jobseeker': '구직자 문의',
+      'dispatch': '파견 문의',
+      'outsourcing': '아웃소싱 문의',
+      'headhunting': '헤드헌팅 문의',
+      'rpo': 'RPO 문의'
+    };
+    return typeMapping[type] || type || '일반';
+  };
+
   useEffect(() => {
     fetchInquiries();
   }, [page]);
@@ -155,7 +168,7 @@ export default function InquiryBoard() {
                           </td>
                           <td className="p-4">
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                              {it.type || '일반'}
+                              {getTypeLabel(it.type)}
                             </span>
                           </td>
                           <td className="p-4 text-gray-600">{it.name}</td>
