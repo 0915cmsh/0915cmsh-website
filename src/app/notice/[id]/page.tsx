@@ -25,8 +25,9 @@ export default function NoticeDetailPage({ params }: { params: Promise<{ id: str
 
   const fetchNotice = async () => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:5203';
-      const res = await fetch(`${baseUrl}/api/notice/${resolvedParams.id}`);
+      const res = await fetch(`/api/notice/${resolvedParams.id}`, { 
+        cache: 'no-store' 
+      });
       if (res.ok) {
         const data = await res.json();
         setNotice(data.item || null);

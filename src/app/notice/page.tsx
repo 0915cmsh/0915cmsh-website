@@ -281,12 +281,16 @@ export default function NoticePage() {
 
   const fetchNotices = async () => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:5203';
-      const res = await fetch(`${baseUrl}/api/notice?page=${currentPage}&pageSize=${itemsPerPage}`);
+      const res = await fetch(`/api/notice?page=${currentPage}&pageSize=${itemsPerPage}`, { 
+        cache: 'no-store' 
+      });
       if (res.ok) {
         const data = await res.json();
+        console.log('API Response:', data); // 디버깅용 로그
         setNotices(data.items || []);
         setTotalNotices(data.total || 0);
+      } else {
+        console.error('API Error:', res.status, res.statusText);
       }
     } catch (error) {
       console.error('Error fetching notices:', error);

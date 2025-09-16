@@ -8,12 +8,9 @@ export async function GET(req: Request) {
   const page = Number(searchParams.get('page') || '1');
   const pageSize = Number(searchParams.get('pageSize') || '10');
 
-  // 2025-10-01 이후 데이터 제외
-  const cutoffDate = new Date('2025-10-01');
+  // published가 true인 공지사항만 조회
   const where = {
-    createdAt: {
-      lt: cutoffDate
-    }
+    published: true
   };
 
   const [total, items] = await Promise.all([
