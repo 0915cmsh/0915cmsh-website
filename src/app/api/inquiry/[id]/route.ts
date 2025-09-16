@@ -9,12 +9,17 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const resolvedParams = await params;
     const id = Number(resolvedParams.id);
     
+    console.log('API: Fetching inquiry with ID:', id, 'Type:', typeof id); // 디버깅 로그
+    
     const inquiry = await prisma.inquiry.findUnique({
       where: { id },
       include: { replies: true },
     });
 
+    console.log('API: Found inquiry:', inquiry ? 'Yes' : 'No'); // 디버깅 로그
+
     if (!inquiry) {
+      console.log('API: Inquiry not found for ID:', id); // 디버깅 로그
       return NextResponse.json({ error: '문의를 찾을 수 없습니다.' }, { status: 404 });
     }
 

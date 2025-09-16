@@ -38,11 +38,19 @@ export default function AdminInquiryDetail({ params }: { params: Promise<{ id: s
 
   const fetchInquiry = async () => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:5203';
-      const res = await fetch(`${baseUrl}/api/inquiry/${resolvedParams.id}`);
+      console.log('Fetching inquiry with ID:', resolvedParams.id); // 디버깅 로그
+      const res = await fetch(`/api/inquiry/${resolvedParams.id}`, { 
+        cache: 'no-store' 
+      });
+      console.log('API Response status:', res.status); // 디버깅 로그
+      
       if (res.ok) {
         const inquiryData = await res.json();
+        console.log('Inquiry data:', inquiryData); // 디버깅 로그
         setInquiry(inquiryData);
+      } else {
+        const errorData = await res.json();
+        console.error('API Error:', errorData); // 디버깅 로그
       }
     } catch (error) {
       console.error('Error fetching inquiry:', error);
@@ -56,8 +64,7 @@ export default function AdminInquiryDetail({ params }: { params: Promise<{ id: s
     if (!newReply.trim()) return;
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:5203';
-      const res = await fetch(`${baseUrl}/api/inquiry/${resolvedParams.id}/reply`, {
+      const res = await fetch(`/api/inquiry/${resolvedParams.id}/reply`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -85,8 +92,7 @@ export default function AdminInquiryDetail({ params }: { params: Promise<{ id: s
     if (!confirm('이 답변을 삭제하시겠습니까?')) return;
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:5203';
-      const res = await fetch(`${baseUrl}/api/inquiry/${resolvedParams.id}/reply`, {
+      const res = await fetch(`/api/inquiry/${resolvedParams.id}/reply`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
