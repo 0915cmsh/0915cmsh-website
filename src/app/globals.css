@@ -1,0 +1,158 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #FFFFFF;            /* Main Background */
+  --surface: #F7FAFC;       /* Content Area Background */
+  --primary: #366DFF;       /* Accent */
+  --primary-hover: #2559D9;
+  --text: #1A202C;          /* Primary text */
+  --border: #E2E8F0;        /* Subtle border */
+  
+  /* 기존 변수들 */
+  --background: var(--bg);
+  --foreground: var(--text);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html, body, #__next { height: 100%; }
+body { background: var(--bg); color: var(--text); }
+
+/* Layout */
+.header, .footer { background: var(--bg); border-color: var(--border); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; }
+.section-pad { padding: 64px 0; }
+.section-pad-lg { padding: 96px 0; }
+
+/* Typography */
+a { color: var(--primary); }
+a:hover { text-decoration: underline; }
+.h1-pp { font-size: 44px; line-height: 1.1; letter-spacing: -0.02em; }
+.h2-pp { font-size: 28px; line-height: 1.2; letter-spacing: -0.01em; }
+.cap-pp { font-size: 14px; letter-spacing: .08em; text-transform: uppercase; }
+
+/* Buttons */
+.btn-primary { 
+  background: var(--primary); 
+  color: #fff; 
+  border-radius: 12px; 
+  padding: .75rem 1.25rem; 
+  transition: background-color 0.2s ease;
+}
+.btn-primary:hover { 
+  background: var(--primary-hover); 
+}
+.btn-secondary { 
+  background: var(--bg); 
+  color: var(--primary); 
+  border: 1px solid var(--primary); 
+  border-radius: 12px; 
+  padding: .75rem 1.25rem; 
+  transition: all 0.2s ease;
+}
+.btn-secondary:hover { 
+  background: var(--primary); 
+  color: #fff; 
+}
+
+/* Inputs */
+.input { 
+  background: var(--surface); 
+  color: var(--text); 
+  border: 1px solid var(--border); 
+  border-radius: 10px; 
+  padding: .625rem .75rem; 
+}
+.input:focus { 
+  outline: none; 
+  border: 1.5px solid var(--primary); 
+}
+
+/* Input Field for Inquiry Forms */
+.input-field {
+  width: 100%;
+  background: #ffffff;
+  color: #1a202c;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #366dff;
+  box-shadow: 0 0 0 3px rgba(54, 109, 255, 0.1);
+}
+
+.input-field:hover {
+  border-color: #cbd5e0;
+}
+
+.input-field::placeholder {
+  color: #a0aec0;
+}
+
+/* Tabs */
+.tab { 
+  background: var(--surface); 
+  color: var(--text); 
+  border-radius: 12px; 
+  padding: .5rem 1.25rem; 
+}
+.tab-active { 
+  background: var(--primary); 
+  color: #fff; 
+  box-shadow: 0 4px 16px rgba(54,109,255,.25); 
+}
+
+/* Marquee */
+@keyframes mar { 
+  from { transform: translateX(0) } 
+  to { transform: translateX(-50%) } 
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+.partner-chip { 
+  background: #fff; 
+  color: #111; 
+  border-radius: 14px; 
+  padding: 18px 22px; 
+  display: flex; 
+  align-items: center; 
+  gap: 12px; 
+  min-width: 180px; 
+}
+
+/* Text Shadows for Hero Section */
+.text-shadow-sm { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); }
+.text-shadow-md { text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6); }
+.text-shadow-lg { text-shadow: 0 4px 8px rgba(0, 0, 0, 0.7); }
+.text-shadow-xl { text-shadow: 0 8px 16px rgba(0, 0, 0, 0.8); }
+.text-shadow-2xl { text-shadow: 0 16px 32px rgba(0, 0, 0, 0.9); }
+
+/* Drop Shadows */
+.drop-shadow-sm { filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5)); }
+.drop-shadow-md { filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6)); }
+.drop-shadow-lg { filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.7)); }
+.drop-shadow-xl { filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.8)); }
+.drop-shadow-2xl { filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.9)); }
