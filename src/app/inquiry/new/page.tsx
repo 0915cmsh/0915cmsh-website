@@ -1,10 +1,10 @@
 'use client';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Section from '@/components/Section';
 
-export default function NewInquiryPage() {
+function InquiryForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const typeParam = searchParams.get('type') || 'corporate';
@@ -611,5 +611,13 @@ export default function NewInquiryPage() {
         </div>
       </Section>
     </div>
+  );
+}
+
+export default function NewInquiryPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <InquiryForm />
+    </Suspense>
   );
 }

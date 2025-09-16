@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 
 // 이메일 설정 (네이버 웍스)
-const transporter = nodemailer.createTransporter({
+const transporter = nodemailer.createTransport({
   host: 'smtp.naver.com',
   port: 587,
   secure: false, // true for 465, false for other ports

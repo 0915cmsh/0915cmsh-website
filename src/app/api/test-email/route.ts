@@ -12,7 +12,7 @@ export async function GET() {
       SMTP_PASS: process.env.SMTP_PASS ? '***설정됨***' : '미설정'
     });
 
-    const transporter = nodemailer.createTransporter({
+    const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST || 'smtp.worksmobile.com',
       port: parseInt(process.env.SMTP_PORT || '465'),
       secure: process.env.SMTP_SECURE === 'true',
@@ -48,14 +48,14 @@ export async function GET() {
       message: '이메일 발송 테스트 성공',
       messageId: result.messageId 
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('이메일 발송 테스트 실패:', error);
     return NextResponse.json({ 
       success: false, 
-      error: error.message,
+      error: error?.message || 'Unknown error',
       details: {
-        code: error.code,
-        response: error.response
+        code: error?.code,
+        response: error?.response
       }
     }, { status: 500 });
   }
