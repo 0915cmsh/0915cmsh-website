@@ -32,17 +32,23 @@ export default function AdminNewNotice() {
     setLoading(true);
     
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:5203';
-      const res = await fetch(`${baseUrl}/api/notice`, {
+      console.log('Creating notice with data:', formData); // 디버깅 로그
+      const res = await fetch('/api/notice', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
       
+      console.log('Create response status:', res.status); // 디버깅 로그
+      
       if (res.ok) {
+        const data = await res.json();
+        console.log('Created notice:', data); // 디버깅 로그
         alert('공지사항이 작성되었습니다.');
         router.push('/admin/dashboard');
       } else {
+        const errorData = await res.json();
+        console.error('Create error:', errorData); // 디버깅 로그
         alert('공지사항 작성에 실패했습니다.');
       }
     } catch (error) {

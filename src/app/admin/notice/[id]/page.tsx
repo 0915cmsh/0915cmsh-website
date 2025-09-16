@@ -31,10 +31,15 @@ export default function AdminNoticeEdit({ params }: { params: Promise<{ id: stri
 
   const fetchNotice = async () => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:5203';
-      const res = await fetch(`${baseUrl}/api/notice/${resolvedParams.id}`, { cache: 'no-store' });
+      console.log('Fetching notice with ID:', resolvedParams.id); // 디버깅 로그
+      const res = await fetch(`/api/notice/${resolvedParams.id}`, { 
+        cache: 'no-store' 
+      });
+      console.log('API Response status:', res.status); // 디버깅 로그
+      
       if (res.ok) {
         const data = await res.json();
+        console.log('Notice data:', data); // 디버깅 로그
         setNotice(data.item || null);
         if (data.item) {
           setEditData({
@@ -43,6 +48,9 @@ export default function AdminNoticeEdit({ params }: { params: Promise<{ id: stri
             published: data.item.published
           });
         }
+      } else {
+        const errorData = await res.json();
+        console.error('API Error:', errorData); // 디버깅 로그
       }
     } catch (error) {
       console.error('Error fetching notice:', error);
@@ -54,8 +62,8 @@ export default function AdminNoticeEdit({ params }: { params: Promise<{ id: stri
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:5203';
-      const res = await fetch(`${baseUrl}/api/notice/${resolvedParams.id}`, {
+      console.log('Updating notice with data:', editData); // 디버깅 로그
+      const res = await fetch(`/api/notice/${resolvedParams.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -63,11 +71,15 @@ export default function AdminNoticeEdit({ params }: { params: Promise<{ id: stri
         body: JSON.stringify(editData),
       });
 
+      console.log('Update response status:', res.status); // 디버깅 로그
+
       if (res.ok) {
         setIsEditing(false);
         fetchNotice(); // Refresh notice data
         alert('공지사항이 수정되었습니다.');
       } else {
+        const errorData = await res.json();
+        console.error('Update error:', errorData); // 디버깅 로그
         alert('공지사항 수정에 실패했습니다.');
       }
     } catch (error) {
@@ -80,15 +92,19 @@ export default function AdminNoticeEdit({ params }: { params: Promise<{ id: stri
     if (!confirm('정말로 이 공지사항을 삭제하시겠습니까?')) return;
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:5203';
-      const res = await fetch(`${baseUrl}/api/notice/${resolvedParams.id}`, {
+      console.log('Deleting notice with ID:', resolvedParams.id); // 디버깅 로그
+      const res = await fetch(`/api/notice/${resolvedParams.id}`, {
         method: 'DELETE',
       });
+
+      console.log('Delete response status:', res.status); // 디버깅 로그
 
       if (res.ok) {
         alert('공지사항이 삭제되었습니다.');
         window.location.href = '/admin/dashboard';
       } else {
+        const errorData = await res.json();
+        console.error('Delete error:', errorData); // 디버깅 로그
         alert('공지사항 삭제에 실패했습니다.');
       }
     } catch (error) {
