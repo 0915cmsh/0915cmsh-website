@@ -156,3 +156,13 @@ a:hover { text-decoration: underline; }
 .drop-shadow-lg { filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.7)); }
 .drop-shadow-xl { filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.8)); }
 .drop-shadow-2xl { filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.9)); }
+
+/* 모바일 가로 스크롤 메뉴 스타일 */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}

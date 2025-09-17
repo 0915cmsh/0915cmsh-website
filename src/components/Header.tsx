@@ -1,10 +1,8 @@
 'use client';
 import Link from 'next/link';
-import { useState } from 'react';
 import { COMPANY } from '@/lib/company';
 
 export default function Header(){
-  const [open,setOpen]=useState(false);
   return (
     <header className="header border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -38,42 +36,41 @@ export default function Header(){
             <span>카카오톡 상담</span>
           </a>
         </nav>
-        <button className="md:hidden text-black text-xl" onClick={()=>setOpen(v=>!v)} aria-label="메뉴">≡</button>
       </div>
-      {open && (
-        <div className="md:hidden border-t" style={{borderColor:'var(--border)'}}>
-          <div className="px-4 py-3 flex flex-col gap-2">
-            <Link href="/" onClick={()=>setOpen(false)} className="group px-3 py-2 text-black text-lg transition-all duration-300 hover:text-blue-600 hover:bg-blue-50 hover:scale-105 hover:font-bold rounded-lg whitespace-nowrap">
+      {/* 모바일 가로 스크롤 메뉴 */}
+      <div className="md:hidden border-t bg-white" style={{borderColor:'var(--border)'}}>
+        <div className="px-4 py-3 overflow-x-auto scrollbar-hide">
+          <div className="flex gap-4 min-w-max">
+            <Link href="/" className="group px-4 py-2 text-black text-base font-medium transition-all duration-300 hover:text-blue-600 hover:bg-blue-50 hover:scale-105 hover:font-bold rounded-lg whitespace-nowrap flex-shrink-0">
               홈
             </Link>
-            <Link href="/about/greeting" onClick={()=>setOpen(false)} className="group px-3 py-2 text-black text-lg transition-all duration-300 hover:text-blue-600 hover:bg-blue-50 hover:scale-105 hover:font-bold rounded-lg whitespace-nowrap">
+            <Link href="/about/greeting" className="group px-4 py-2 text-black text-base font-medium transition-all duration-300 hover:text-blue-600 hover:bg-blue-50 hover:scale-105 hover:font-bold rounded-lg whitespace-nowrap flex-shrink-0">
               회사소개
             </Link>
-            <Link href="/business" onClick={()=>setOpen(false)} className="group px-3 py-2 text-black text-lg transition-all duration-300 hover:text-blue-600 hover:bg-blue-50 hover:scale-105 hover:font-bold rounded-lg whitespace-nowrap">
+            <Link href="/business" className="group px-4 py-2 text-black text-base font-medium transition-all duration-300 hover:text-blue-600 hover:bg-blue-50 hover:scale-105 hover:font-bold rounded-lg whitespace-nowrap flex-shrink-0">
               사업소개
             </Link>
-            <Link href="/notice" onClick={()=>setOpen(false)} className="group px-3 py-2 text-black text-lg transition-all duration-300 hover:text-blue-600 hover:bg-blue-50 hover:scale-105 hover:font-bold rounded-lg whitespace-nowrap">
+            <Link href="/notice" className="group px-4 py-2 text-black text-base font-medium transition-all duration-300 hover:text-blue-600 hover:bg-blue-50 hover:scale-105 hover:font-bold rounded-lg whitespace-nowrap flex-shrink-0">
               공지사항
             </Link>
-            <Link href="/faq" onClick={()=>setOpen(false)} className="group px-3 py-2 text-black text-lg transition-all duration-300 hover:text-blue-600 hover:bg-blue-50 hover:scale-105 hover:font-bold rounded-lg whitespace-nowrap">
+            <Link href="/faq" className="group px-4 py-2 text-black text-base font-medium transition-all duration-300 hover:text-blue-600 hover:bg-blue-50 hover:scale-105 hover:font-bold rounded-lg whitespace-nowrap flex-shrink-0">
               자주묻는질문
             </Link>
-            <Link href="/inquiry/board" onClick={()=>setOpen(false)} className="group px-3 py-2 text-black text-lg transition-all duration-300 hover:text-blue-600 hover:bg-blue-50 hover:scale-105 hover:font-bold rounded-lg whitespace-nowrap">
+            <Link href="/inquiry/board" className="group px-4 py-2 text-black text-base font-medium transition-all duration-300 hover:text-blue-600 hover:bg-blue-50 hover:scale-105 hover:font-bold rounded-lg whitespace-nowrap flex-shrink-0">
               문의하기
             </Link>
             <a
               href="https://open.kakao.com/o/sqRWR9Qh"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-gray-800 px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 transform shadow-md mt-2"
-              onClick={()=>setOpen(false)}
+              className="flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-gray-800 px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 transform shadow-md whitespace-nowrap flex-shrink-0"
             >
-              <span className="text-lg">💬</span>
+              <span className="text-base">💬</span>
               <span>카카오톡 상담</span>
             </a>
           </div>
         </div>
-      )}
+      </div>
     </header>
   );
 }
