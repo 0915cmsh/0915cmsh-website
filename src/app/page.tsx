@@ -46,7 +46,7 @@ export default function Home() {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-4 gap-8">
           {services.map((service, index) => (
             <ServiceCard
               key={index}
@@ -83,15 +83,15 @@ export default function Home() {
             </div>
           </div>
           
-          <h2 className="text-5xl md:text-6xl font-black mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">
+          <h2 className="text-6xl font-black mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">
             지금 시작하세요
           </h2>
           
-          <p className="text-2xl md:text-3xl text-gray-700 mb-12 font-medium max-w-3xl mx-auto leading-relaxed">
+          <p className="text-3xl text-gray-700 mb-12 font-medium max-w-3xl mx-auto leading-relaxed">
             전문가와 상담하여 <span className="text-blue-600 font-bold">최적의 솔루션</span>을 찾아보세요
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-6 justify-center max-w-4xl mx-auto">
+          <div className="flex flex-row gap-6 justify-center max-w-4xl mx-auto">
             <a
               href="/inquiry/corporate"
               className="group relative bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-4 rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:from-blue-700 hover:to-blue-800"
@@ -126,7 +126,7 @@ export default function Home() {
           </div>
 
           {/* 추가 정보 카드 */}
-          <div className="mt-16 grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          <div className="mt-16 grid grid-cols-3 gap-6 max-w-4xl mx-auto">
             <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/50">
               <div className="text-3xl mb-3">⚡</div>
               <h3 className="font-bold text-gray-800 mb-2">빠른 상담</h3>

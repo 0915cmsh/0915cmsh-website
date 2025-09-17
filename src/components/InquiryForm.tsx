@@ -80,7 +80,7 @@ export default function InquiryForm({ type }: InquiryFormProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8">
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="max-w-4xl mx-auto px-6">
         {/* 히어로 섹션 */}
         <div className="text-center mb-12">
           <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-2xl p-8 mb-8 shadow-xl">
@@ -93,7 +93,7 @@ export default function InquiryForm({ type }: InquiryFormProps) {
                type === 'headhunting' ? '🎯' :
                type === 'rpo' ? '📋' : '📝'}
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">{getTypeLabel()}</h1>
+            <h1 className="text-4xl font-bold mb-4">{getTypeLabel()}</h1>
             <p className="text-xl text-blue-100">
               {type === 'corporate' 
                 ? '전문적인 인력 솔루션으로 비즈니스 성장을 지원합니다'
@@ -122,7 +122,7 @@ export default function InquiryForm({ type }: InquiryFormProps) {
           </div>
           
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-3">
                   이름 *

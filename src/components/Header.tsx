@@ -7,25 +7,25 @@ export default function Header(){
   const [open,setOpen]=useState(false);
   return (
     <header className="header border-b">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <Link href="/" className="text-xl font-bold">{COMPANY.name}</Link>
-        <nav className="hidden md:flex items-center gap-6 text-sm">
-          <Link href="/" className="group px-3 py-2 transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
+        <nav className="flex items-center gap-6 text-lg">
+          <Link href="/" className="group px-3 py-2 text-black transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
             홈
           </Link>
-          <Link href="/about/greeting" className="group px-3 py-2 transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
+          <Link href="/about/greeting" className="group px-3 py-2 text-black transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
             회사소개
           </Link>
-          <Link href="/business" className="group px-3 py-2 transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
+          <Link href="/business" className="group px-3 py-2 text-black transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
             사업소개
           </Link>
-          <Link href="/notice" className="group px-3 py-2 transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
+          <Link href="/notice" className="group px-3 py-2 text-black transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
             공지사항
           </Link>
-          <Link href="/faq" className="group px-3 py-2 transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
+          <Link href="/faq" className="group px-3 py-2 text-black transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
             자주묻는질문
           </Link>
-          <Link href="/inquiry/board" className="group px-3 py-2 transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
+          <Link href="/inquiry/board" className="group px-3 py-2 text-black transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
             문의하기
           </Link>
           <a
@@ -38,27 +38,27 @@ export default function Header(){
             <span>카카오톡 상담</span>
           </a>
         </nav>
-        <button className="md:hidden" onClick={()=>setOpen(v=>!v)} aria-label="메뉴">≡</button>
+        <button className="hidden" onClick={()=>setOpen(v=>!v)} aria-label="메뉴">≡</button>
       </div>
       {open && (
-        <div className="md:hidden border-t" style={{borderColor:'var(--border)'}}>
+        <div className="hidden border-t" style={{borderColor:'var(--border)'}}>
           <div className="px-4 py-3 flex flex-col gap-2">
-            <Link href="/" onClick={()=>setOpen(false)} className="group px-3 py-2 transition-all duration-300 hover:text-blue-600 hover:bg-blue-50 hover:scale-105 hover:font-bold rounded-lg">
+            <Link href="/" onClick={()=>setOpen(false)} className="group px-3 py-2 text-black text-lg transition-all duration-300 hover:text-blue-600 hover:bg-blue-50 hover:scale-105 hover:font-bold rounded-lg">
               홈
             </Link>
-            <Link href="/about/greeting" onClick={()=>setOpen(false)} className="group px-3 py-2 transition-all duration-300 hover:text-blue-600 hover:bg-blue-50 hover:scale-105 hover:font-bold rounded-lg">
+            <Link href="/about/greeting" onClick={()=>setOpen(false)} className="group px-3 py-2 text-black text-lg transition-all duration-300 hover:text-blue-600 hover:bg-blue-50 hover:scale-105 hover:font-bold rounded-lg">
               회사소개
             </Link>
-            <Link href="/business" onClick={()=>setOpen(false)} className="group px-3 py-2 transition-all duration-300 hover:text-blue-600 hover:bg-blue-50 hover:scale-105 hover:font-bold rounded-lg">
+            <Link href="/business" onClick={()=>setOpen(false)} className="group px-3 py-2 text-black text-lg transition-all duration-300 hover:text-blue-600 hover:bg-blue-50 hover:scale-105 hover:font-bold rounded-lg">
               사업소개
             </Link>
-            <Link href="/notice" onClick={()=>setOpen(false)} className="group px-3 py-2 transition-all duration-300 hover:text-blue-600 hover:bg-blue-50 hover:scale-105 hover:font-bold rounded-lg">
+            <Link href="/notice" onClick={()=>setOpen(false)} className="group px-3 py-2 text-black text-lg transition-all duration-300 hover:text-blue-600 hover:bg-blue-50 hover:scale-105 hover:font-bold rounded-lg">
               공지사항
             </Link>
-            <Link href="/faq" onClick={()=>setOpen(false)} className="group px-3 py-2 transition-all duration-300 hover:text-blue-600 hover:bg-blue-50 hover:scale-105 hover:font-bold rounded-lg">
+            <Link href="/faq" onClick={()=>setOpen(false)} className="group px-3 py-2 text-black text-lg transition-all duration-300 hover:text-blue-600 hover:bg-blue-50 hover:scale-105 hover:font-bold rounded-lg">
               자주묻는질문
             </Link>
-            <Link href="/inquiry/board" onClick={()=>setOpen(false)} className="group px-3 py-2 transition-all duration-300 hover:text-blue-600 hover:bg-blue-50 hover:scale-105 hover:font-bold rounded-lg">
+            <Link href="/inquiry/board" onClick={()=>setOpen(false)} className="group px-3 py-2 text-black text-lg transition-all duration-300 hover:text-blue-600 hover:bg-blue-50 hover:scale-105 hover:font-bold rounded-lg">
               문의하기
             </Link>
             <a

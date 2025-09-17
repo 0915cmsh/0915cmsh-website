@@ -12,7 +12,7 @@ export default function PartnerMarquee() {
   const items = [...partners, ...partners]; // seamless
   return (
     <section className="py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold">신뢰받는 파트너사</h2>
           <p className="opacity-85">다양한 산업의 기업과 함께 성장하고 있습니다</p>
