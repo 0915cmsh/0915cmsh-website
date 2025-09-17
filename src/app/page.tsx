@@ -46,7 +46,7 @@ export default function Home() {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
           {services.map((service, index) => (
             <ServiceCard
               key={index}
@@ -83,18 +83,18 @@ export default function Home() {
             </div>
           </div>
           
-          <h2 className="text-5xl md:text-6xl font-black mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent break-words">
             지금 시작하세요
           </h2>
           
-          <p className="text-2xl md:text-3xl text-gray-700 mb-12 font-medium max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-700 mb-8 sm:mb-12 font-medium max-w-3xl mx-auto leading-relaxed break-words">
             전문가와 상담하여 <span className="text-blue-600 font-bold">최적의 솔루션</span>을 찾아보세요
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-6 justify-center max-w-4xl mx-auto">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center max-w-4xl mx-auto">
             <a
               href="/inquiry/corporate"
-              className="group relative bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-4 rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:from-blue-700 hover:to-blue-800"
+              className="group relative bg-gradient-to-r from-blue-600 to-blue-700 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:from-blue-700 hover:to-blue-800 w-full sm:w-auto"
             >
               <span className="relative z-10 flex items-center justify-center gap-2 text-white">
                 기업 문의
@@ -105,7 +105,7 @@ export default function Home() {
             
             <a
               href="/inquiry/jobseeker"
-              className="group relative bg-white text-blue-600 px-8 py-4 rounded-xl font-bold text-lg border-2 border-blue-600 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:bg-blue-50"
+              className="group relative bg-white text-blue-600 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg border-2 border-blue-600 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:bg-blue-50 w-full sm:w-auto"
             >
               <span className="relative z-10 flex items-center justify-center gap-2">
                 구직자 문의
@@ -115,7 +115,7 @@ export default function Home() {
 
             <a
               href="/inquiry/employee"
-              className="group relative bg-gradient-to-r from-purple-600 to-purple-700 px-8 py-4 rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:from-purple-700 hover:to-purple-800"
+              className="group relative bg-gradient-to-r from-purple-600 to-purple-700 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:from-purple-700 hover:to-purple-800 w-full sm:w-auto"
             >
               <span className="relative z-10 flex items-center justify-center gap-2 text-white">
                 재직자 문의
@@ -126,21 +126,21 @@ export default function Home() {
           </div>
 
           {/* 추가 정보 카드 */}
-          <div className="mt-16 grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/50">
+          <div className="mt-12 sm:mt-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto">
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 sm:p-6 shadow-lg border border-white/50 w-full">
               <div className="text-3xl mb-3">⚡</div>
-              <h3 className="font-bold text-gray-800 mb-2">빠른 상담</h3>
-              <p className="text-gray-600 text-sm">24시간 내 전문가 상담</p>
+              <h3 className="font-bold text-gray-800 mb-2 break-words">빠른 상담</h3>
+              <p className="text-gray-600 text-sm break-words">24시간 내 전문가 상담</p>
             </div>
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/50">
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 sm:p-6 shadow-lg border border-white/50 w-full">
               <div className="text-3xl mb-3">🎯</div>
-              <h3 className="font-bold text-gray-800 mb-2">맞춤 솔루션</h3>
-              <p className="text-gray-600 text-sm">고객별 최적화된 서비스</p>
+              <h3 className="font-bold text-gray-800 mb-2 break-words">맞춤 솔루션</h3>
+              <p className="text-gray-600 text-sm break-words">고객별 최적화된 서비스</p>
             </div>
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/50">
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 sm:p-6 shadow-lg border border-white/50 w-full">
               <div className="text-3xl mb-3">🤝</div>
-              <h3 className="font-bold text-gray-800 mb-2">신뢰할 수 있는 파트너</h3>
-              <p className="text-gray-600 text-sm">검증된 전문성과 경험</p>
+              <h3 className="font-bold text-gray-800 mb-2 break-words">신뢰할 수 있는 파트너</h3>
+              <p className="text-gray-600 text-sm break-words">검증된 전문성과 경험</p>
             </div>
           </div>
         </div>

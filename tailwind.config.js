@@ -7,13 +7,6 @@ module.exports = {
   ],
   theme: {
     extend: {},
-    screens: {
-      // 반응형 브레이크포인트 비활성화
-      // sm: "640px",
-      // md: "768px", 
-      // lg: "1024px",
-      // xl: "1280px",
-    },
   },
   plugins: [],
 }
