@@ -318,7 +318,7 @@ export default function NoticePage() {
       <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
         <Section>
           <div className="text-center">
-            <h1 className="text-5xl font-bold mb-6">공지사항</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">공지사항</h1>
             <p className="text-xl text-blue-100">
               CMSH의 최신 소식과 공지사항을 확인해보세요
             </p>

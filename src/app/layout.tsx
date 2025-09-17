@@ -18,7 +18,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: `${COMPANY.name} - ${COMPANY.tagline}`,
   description: `${COMPANY.name}는 인재파견, 도급/업무위탁, 헤드헌팅, RPO 등 다양한 인재 솔루션을 제공하는 전문 기업입니다.`,
-  viewport: "width=1024",
 };
 
 export default function RootLayout({
