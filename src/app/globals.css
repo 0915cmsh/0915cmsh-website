@@ -222,4 +222,43 @@ a:hover { text-decoration: underline; }
   .hero-mobile .hero-scroll-indicator {
     bottom: 1rem !important;
   }
+  
+  /* 모바일 파트너 마퀴 최적화 */
+  .partner-marquee-mobile {
+    padding: 2rem 0 !important;
+  }
+  
+  .partner-marquee-mobile .partner-chip {
+    min-width: 120px !important;
+    padding: 12px 16px !important;
+  }
+  
+  .partner-marquee-mobile .partner-logo {
+    width: 80px !important;
+    height: 60px !important;
+  }
+  
+  .partner-marquee-mobile .animate-marquee {
+    animation-duration: 20s !important;
+  }
+  
+  /* 모바일 터치 스크롤 활성화 */
+  .partner-marquee-mobile .overflow-hidden {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+  
+  .partner-marquee-mobile .overflow-hidden::-webkit-scrollbar {
+    display: none !important;
+  }
+  
+  .partner-marquee-mobile .flex {
+    animation-play-state: paused !important;
+  }
+  
+  .partner-marquee-mobile .flex:hover {
+    animation-play-state: running !important;
+  }
 }
