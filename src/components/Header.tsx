@@ -8,22 +8,22 @@ export default function Header(){
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <Link href="/" className="text-xl font-bold">{COMPANY.name}</Link>
         <nav className="hidden md:flex items-center gap-6 text-lg">
-          <Link href="/" className="group px-3 py-2 text-black transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
+          <Link href="/" className="group px-3 py-2 !text-black transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
             홈
           </Link>
-          <Link href="/about/greeting" className="group px-3 py-2 text-black transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
+          <Link href="/about/greeting" className="group px-3 py-2 !text-black transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
             회사소개
           </Link>
-          <Link href="/business" className="group px-3 py-2 text-black transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
+          <Link href="/business" className="group px-3 py-2 !text-black transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
             사업소개
           </Link>
-          <Link href="/notice" className="group px-3 py-2 text-black transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
+          <Link href="/notice" className="group px-3 py-2 !text-black transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
             공지사항
           </Link>
-          <Link href="/faq" className="group px-3 py-2 text-black transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
+          <Link href="/faq" className="group px-3 py-2 !text-black transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
             자주묻는질문
           </Link>
-          <Link href="/inquiry/board" className="group px-3 py-2 text-black transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
+          <Link href="/inquiry/board" className="group px-3 py-2 !text-black transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
             문의하기
           </Link>
           <a
