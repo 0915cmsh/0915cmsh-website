@@ -281,19 +281,32 @@ export default function NoticePage() {
 
   const fetchNotices = async () => {
     try {
+      console.log('🔍 공지사항 API 호출 시작...');
       const res = await fetch(`/api/notice?page=${currentPage}&pageSize=${itemsPerPage}`, { 
         cache: 'no-store' 
       });
+      
+      console.log('📡 API 응답 상태:', res.status, res.statusText);
+      
       if (res.ok) {
         const data = await res.json();
-        console.log('API Response:', data); // 디버깅용 로그
+        console.log('✅ API 응답 데이터:', data);
+        console.log('📊 받은 공지사항 수:', data.items?.length || 0);
         setNotices(data.items || []);
         setTotalNotices(data.total || 0);
       } else {
-        console.error('API Error:', res.status, res.statusText);
+        console.error('❌ API 에러:', res.status, res.statusText);
+        const errorText = await res.text();
+        console.error('❌ 에러 상세:', errorText);
+        // 에러 발생 시 빈 배열로 설정
+        setNotices([]);
+        setTotalNotices(0);
       }
     } catch (error) {
-      console.error('Error fetching notices:', error);
+      console.error('❌ 네트워크 에러:', error);
+      // 네트워크 에러 발생 시 빈 배열로 설정
+      setNotices([]);
+      setTotalNotices(0);
     } finally {
       setLoading(false);
     }
