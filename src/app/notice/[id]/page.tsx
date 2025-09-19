@@ -1,78 +1,54 @@
-'use client';
-import { useState, useEffect, use } from 'react';
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import Section from '@/components/Section';
-import { formatKoreanDate } from '@/lib/utils';
 
-interface Notice {
-  id: number;
-  title: string;
-  content: string;
-  author: string;
-  published: boolean;
-  createdAt: string;
-  updatedAt: string;
+async function getItem(id: string) {
+  const res = await fetch('/api/notice', { cache: 'no-store' });
+  if (!res.ok) return null;
+  const data = await res.json();
+  const items = Array.isArray(data) ? data : (data.items ?? []);
+  return items.find((x: any) => String(x.id) === id) ?? null;
 }
 
-export default function NoticeDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = use(params);
-  const [notice, setNotice] = useState<Notice | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchNotice();
-  }, [resolvedParams.id]);
-
-  const fetchNotice = async () => {
-    try {
-      const res = await fetch(`/api/notice/${resolvedParams.id}`, { 
-        cache: 'no-store' 
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setNotice(data.item || null);
-      }
-    } catch (error) {
-      console.error('Error fetching notice:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
+export default async function NoticeDetail({ params }: { params: { id: string } }) {
+  const item = await getItem(params.id);
+  
+  if (!item) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">로딩 중...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!notice) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">공지사항을 찾을 수 없습니다</h1>
-          <p className="text-gray-600 mb-6">요청하신 공지사항이 존재하지 않거나 삭제되었습니다.</p>
-          <Link href="/notice" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
-            공지사항 목록으로 돌아가기
-          </Link>
-        </div>
+      <div>
+        <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
+          <Section>
+            <div className="text-center">
+              <h1 className="text-4xl md:text-5xl font-bold mb-6">공지사항</h1>
+            </div>
+          </Section>
+        </section>
+        <Section className="py-16">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">존재하지 않는 공지입니다</h2>
+            <p className="text-gray-600 mb-6">요청하신 공지사항을 찾을 수 없습니다.</p>
+            <Link 
+              href="/notice" 
+              className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              공지사항 목록으로 돌아가기
+            </Link>
+          </div>
+        </Section>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
+    <div>
+      {/* 히어로 섹션 */}
       <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
         <Section>
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">공지사항</h1>
             <p className="text-xl text-blue-100">
-              CMSH의 최신 소식과 중요한 안내사항을 확인하세요
+              CMSH의 최신 소식과 공지사항을 확인해보세요
             </p>
           </div>
         </Section>
@@ -85,17 +61,15 @@ export default function NoticeDetailPage({ params }: { params: Promise<{ id: str
             {/* 공지사항 헤더 */}
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-6 border-b">
               <div className="flex justify-between items-start mb-4">
-                <h2 className="text-2xl font-bold text-gray-900">{notice.title}</h2>
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                  notice.published ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                }`}>
-                  {notice.published ? '게시됨' : '비공개'}
+                <h2 className="text-2xl font-bold text-gray-900">{item.title}</h2>
+                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                  게시됨
                 </span>
               </div>
-              <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-                <span>작성자: {notice.author}</span>
-                <span>작성일: {formatKoreanDate(notice.createdAt)}</span>
-                <span>수정일: {formatKoreanDate(notice.updatedAt)}</span>
+              <div className="flex items-center text-sm text-gray-600">
+                <span className="mr-4">작성자: 관리자</span>
+                <span className="mr-4">작성일: {new Date(item.createdAt).toLocaleDateString('ko-KR')}</span>
+                <span>수정일: {new Date(item.createdAt).toLocaleDateString('ko-KR')}</span>
               </div>
             </div>
 
@@ -103,7 +77,9 @@ export default function NoticeDetailPage({ params }: { params: Promise<{ id: str
             <div className="px-8 py-8">
               <div className="prose max-w-none">
                 <div className="bg-gray-50 rounded-lg p-6">
-                  <div dangerouslySetInnerHTML={{ __html: notice.content.replace(/\n/g, '<br>') }} />
+                  <div className="whitespace-pre-wrap text-gray-800 leading-relaxed">
+                    {item.body}
+                  </div>
                 </div>
               </div>
             </div>
