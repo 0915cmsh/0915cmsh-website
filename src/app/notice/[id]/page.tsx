@@ -119,7 +119,7 @@ export default function NoticeDetailPage({ params }: { params: Promise<{ id: str
                 </Link>
                 <Link 
                   href="/inquiry/new" 
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="px-6 py-3 bg-blue-600 !text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   문의하기
                 </Link>
@@ -140,7 +140,7 @@ export default function NoticeDetailPage({ params }: { params: Promise<{ id: str
                   <p className="text-gray-600 mb-4">궁금한 점이 있으시면 언제든지 문의해주세요. 전문 상담사가 신속하게 답변드립니다.</p>
                   <Link
                     href="/inquiry/new"
-                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                    className="inline-flex items-center px-4 py-2 bg-blue-600 !text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
                   >
                     문의하기
                     <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
