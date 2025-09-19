@@ -51,7 +51,7 @@ export default function EmployeeInquiryPage() {
     setLoading(true);
     
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:5203';
+      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.urbane-cmsh.com';
       const res = await fetch(`${baseUrl}/api/inquiry`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
