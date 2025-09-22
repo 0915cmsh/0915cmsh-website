@@ -2,9 +2,10 @@ export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
 import Section from '@/components/Section';
+import { getBaseUrl } from '@/lib/base-url';
 
 async function getItem(id: string) {
-  const res = await fetch('/api/notice', { cache: 'no-store' });
+  const res = await fetch(`${getBaseUrl()}/api/notice`, { cache: 'no-store' });
   if (!res.ok) return null;
   const data = await res.json();
   const items = Array.isArray(data) ? data : (data.items ?? []);
