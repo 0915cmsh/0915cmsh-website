@@ -16,9 +16,8 @@ type Notice = {
 
 const SNAP = (noticeSnapshot as Notice[]).filter(n => n.published !== false);
 
-export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = await params;
-  const id = Number(resolvedParams.id);
+export async function GET(_req: Request, { params }: { params: { id: string } }) {
+  const id = Number(params.id);
   
   console.log('🔍 개별 공지사항 API 호출됨 - ID:', id);
   console.log('📊 런타임 모드:', READ_MODE);
@@ -70,10 +69,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   }
 }
 
-export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function PUT(req: Request, { params }: { params: { id: string } }) {
   try {
-    const resolvedParams = await params;
-    const id = Number(resolvedParams.id);
+    const id = Number(params.id);
     const body = await req.json();
     
     const updated = await prisma.notice.update({
@@ -93,10 +91,9 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: Request, { params }: { params: { id: string } }) {
   try {
-    const resolvedParams = await params;
-    const id = Number(resolvedParams.id);
+    const id = Number(params.id);
     
     await prisma.notice.delete({ where: { id } });
     return NextResponse.json({ ok: true });

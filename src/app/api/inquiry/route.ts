@@ -62,15 +62,6 @@ export async function POST(req: Request) {
     }, { status: 503 });
   }
 
-  try {
-    console.log('🔍 데이터베이스에 문의 저장 시도...');
-    const data = await req.json();
-    const saved = await prisma.inquiry.create({ data });
-    
-    console.log('✅ 문의 저장 성공 - ID:', saved.id);
-    return NextResponse.json(saved, { status: 201 });
-  } catch (e: any) {
-    console.error('❌ 문의 저장 오류:', e.message);
-    return NextResponse.json({ error: e?.message }, { status: 400 });
-  }
+  // TODO: DB 사용 가능해지면 Zod 검증 + bcrypt 해시 저장 로직 활성화
+  return NextResponse.json({ error: 'Not Implemented' }, { status: 501 });
 }

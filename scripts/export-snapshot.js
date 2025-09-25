@@ -1,59 +1,27 @@
-/**
- * 스냅샷 자동 생성 스크립트
- * 로컬 서버에서 실행 중인 API를 호출하여 스냅샷 파일을 생성합니다.
- */
-
+// Node 18+ (fetch 내장). Node<18이면 node-fetch 설치하여 import 교체.
 import fs from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 const base = process.env.BASE_URL || 'http://localhost:3000';
+const j = (x) => JSON.stringify(x, null, 2);
 
-console.log('🚀 스냅샷 생성 시작...');
-console.log('📡 API 베이스 URL:', base);
-
-(async () => {
+const main = async () => {
   try {
-    // 공지사항 스냅샷 생성
-    console.log('📰 공지사항 스냅샷 생성 중...');
-    const resN = await fetch(`${base}/api/notice`);
+    console.log('🚀 스냅샷 생성 시작...');
+    console.log('📡 API 베이스 URL:', base);
     
-    if (!resN.ok) {
-      throw new Error(`공지사항 API 호출 실패: ${resN.status} ${resN.statusText}`);
-    }
+    const n = await fetch(`${base}/api/notice`).then(r => r.json()).catch(()=>({items:[]}));
+    fs.writeFileSync('src/fallback/notice.json', j(n.items || []));
+    console.log(`✅ 공지사항 스냅샷 저장: ${(n.items || []).length}개 항목`);
     
-    const dataN = await resN.json();
-    const noticeData = dataN.items || [];
+    const i = await fetch(`${base}/api/inquiry`).then(r => r.json()).catch(()=>({items:[]}));
+    fs.writeFileSync('src/fallback/inquiry.json', j(i.items || []));
+    console.log(`✅ 문의 스냅샷 저장: ${(i.items || []).length}개 항목`);
     
-    // 공지사항 스냅샷 파일 저장
-    const noticePath = join(__dirname, '../src/fallback/notice.json');
-    fs.writeFileSync(noticePath, JSON.stringify(noticeData, null, 2));
-    console.log(`✅ 공지사항 스냅샷 저장 완료: ${noticeData.length}개 항목`);
-    
-    // 문의 스냅샷 생성
-    console.log('💬 문의 스냅샷 생성 중...');
-    const resI = await fetch(`${base}/api/inquiry`);
-    
-    if (!resI.ok) {
-      throw new Error(`문의 API 호출 실패: ${resI.status} ${resI.statusText}`);
-    }
-    
-    const dataI = await resI.json();
-    const inquiryData = dataI.items || [];
-    
-    // 문의 스냅샷 파일 저장
-    const inquiryPath = join(__dirname, '../src/fallback/inquiry.json');
-    fs.writeFileSync(inquiryPath, JSON.stringify(inquiryData, null, 2));
-    console.log(`✅ 문의 스냅샷 저장 완료: ${inquiryData.length}개 항목`);
-    
-    console.log('🎉 스냅샷 생성 완료!');
-    console.log('📁 저장 위치: src/fallback/');
-    
+    console.log('✓ snapshots written to src/fallback/');
   } catch (error) {
     console.error('❌ 스냅샷 생성 오류:', error.message);
     process.exit(1);
   }
-})();
+};
+
+main();
