@@ -89,7 +89,7 @@ export default async function NoticeDetail({ params }: { params: { id: string } 
               <div className="prose max-w-none">
                 <div className="bg-gray-50 rounded-lg p-6">
                   <div className="whitespace-pre-wrap text-gray-800 leading-relaxed">
-                    {item.body}
+                    {item.content}
                   </div>
                 </div>
               </div>

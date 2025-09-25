@@ -73,7 +73,7 @@ export default async function NoticePage() {
                         공지
                       </span>
                     </div>
-                    <p className="text-gray-600 mb-3 line-clamp-2">{n.body}</p>
+                    <p className="text-gray-600 mb-3 line-clamp-2">{n.content}</p>
                     <div className="flex justify-between items-center text-sm text-gray-500">
                       <span>{new Date(n.createdAt).toLocaleDateString('ko-KR')}</span>
                       <span>작성자: 관리자</span>
