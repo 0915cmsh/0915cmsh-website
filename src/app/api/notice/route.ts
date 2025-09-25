@@ -19,6 +19,16 @@ const FALLBACK_ITEMS = [
 export async function GET(req: Request) {
   const debug = new URL(req.url).searchParams.get('debug') === '1';
 
+  // 🚨 임시 해결책: 항상 Fallback 데이터 반환 (Vercel 배포 문제 해결 전까지)
+  console.log('🔍 API 호출됨 - Fallback 모드로 응답');
+  return NextResponse.json({ 
+    items: FALLBACK_ITEMS, 
+    total: FALLBACK_ITEMS.length, 
+    note: 'temporary-fallback-mode' 
+  }, { status: 200 });
+
+  // 아래 코드는 Vercel 문제 해결 후 활성화
+  /*
   // 1) DB URL 자체가 없으면 즉시 Fallback
   if (!process.env.DATABASE_URL) {
     return NextResponse.json({ items: FALLBACK_ITEMS, total: FALLBACK_ITEMS.length, note: 'no-database-url' }, { status: 200 });
@@ -46,4 +56,5 @@ export async function GET(req: Request) {
     }
     return NextResponse.json({ items: [], total: 0, error: debug ? String(e?.message) : undefined }, { status: 500 });
   }
+  */
 }
