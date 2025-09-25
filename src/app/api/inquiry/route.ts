@@ -1,7 +1,32 @@
 export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
 import { READ_MODE, CAN_USE_DB } from '@/lib/runtime';
-import inquirySnapshot from '@/fallback/inquiry.json';
+
+type Inquiry = { 
+  id: number; 
+  type: string; 
+  title: string; 
+  message: string; 
+  name: string; 
+  phone: string; 
+  email?: string; 
+  status?: string; 
+  createdAt: string; 
+  Reply?: Array<{id: number}> 
+};
+
+async function loadSnapshot(): Promise<Inquiry[]> {
+  try {
+    const mod = await import('../../../fallback/inquiry.json');
+    const arr = (mod as any).default ?? mod;
+    return (arr as Inquiry[]).map(x => ({ 
+      ...x, 
+      status: (x as any)?.Reply?.length ? '답변완료' : '대기' 
+    }));
+  } catch {
+    return [];
+  }
+}
 
 // lazy prisma helper
 type PrismaClientT = typeof import('@prisma/client').PrismaClient;
@@ -19,10 +44,7 @@ async function getPrisma() {
 // GET - 문의 목록 조회
 export async function GET() {
   if (READ_MODE === 'snapshot' || !CAN_USE_DB) {
-    const items = (inquirySnapshot as any[]).map(x => ({ 
-      ...x, 
-      status: x?.Reply?.length ? '답변완료' : '대기' 
-    }));
+    const items = await loadSnapshot();
     return NextResponse.json({ items, total: items.length, note: 'snapshot' });
   }
 
@@ -33,22 +55,18 @@ export async function GET() {
       include: { Reply: { select: { id: true } } }
     });
     
-    const mapped = items.map(x => ({ 
+    const mapped = items.map((x: any) => ({ 
       ...x, 
       status: x.Reply.length ? '답변완료' : '대기' 
     }));
     
     return NextResponse.json({ items: mapped, total: mapped.length, note: 'db' });
   } catch (e: any) {
-    const snap = (inquirySnapshot as any[]).map(x => ({ 
-      ...x, 
-      status: x?.Reply?.length ? '답변완료' : '대기' 
-    }));
+    const snap = await loadSnapshot();
     return NextResponse.json({ 
       items: snap, 
       total: snap.length, 
-      note: 'db-error-snapshot', 
-      error: String(e?.message || e) 
+      note: 'db-error-snapshot' 
     }, { status: 200 });
   }
 }

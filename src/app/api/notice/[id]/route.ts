@@ -1,7 +1,26 @@
 export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
 import { READ_MODE, CAN_USE_DB } from '@/lib/runtime';
-import noticeSnapshot from '@/fallback/notice.json';
+
+type Notice = { 
+  id: number; 
+  title: string; 
+  content: string; 
+  author?: string; 
+  published?: boolean; 
+  createdAt: string; 
+  updatedAt?: string; 
+};
+
+async function loadSnapshot(): Promise<Notice[]> {
+  try {
+    const mod = await import('../../../../fallback/notice.json');
+    const arr = (mod as any).default ?? mod;
+    return (arr as Notice[]).filter(n => n.published !== false);
+  } catch {
+    return [];
+  }
+}
 
 // lazy prisma helper
 type PrismaClientT = typeof import('@prisma/client').PrismaClient;
@@ -16,23 +35,12 @@ async function getPrisma() {
   return _prisma;
 }
 
-type Notice = { 
-  id: number; 
-  title: string; 
-  content: string; 
-  author?: string; 
-  published?: boolean; 
-  createdAt: string; 
-  updatedAt?: string; 
-};
-
-const SNAP = (noticeSnapshot as Notice[]).filter(n => n.published !== false);
-
 export async function GET(_req: Request, { params }: { params: { id: string } }) {
   const id = Number(params.id);
 
   if (READ_MODE === 'snapshot' || !CAN_USE_DB) {
-    const item = SNAP.find(n => n.id === id);
+    const snap = await loadSnapshot();
+    const item = snap.find(n => n.id === id);
     return item ? NextResponse.json({ ok: true, item, note: 'snapshot' }) : NextResponse.json({ error: 'Not Found' }, { status: 404 });
   }
 
@@ -41,8 +49,11 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
     const item = await prisma.notice.findUnique({ where: { id } });
     return item ? NextResponse.json({ ok: true, item, note: 'db' }) : NextResponse.json({ error: 'Not Found' }, { status: 404 });
   } catch (e: any) {
-    const fall = SNAP.find(n => n.id === id);
-    return fall ? NextResponse.json({ ok: true, item: fall, note: 'db-error-snapshot', error: String(e?.message || e) }) : NextResponse.json({ error: 'Not Found' }, { status: 404 });
+    const snap = await loadSnapshot();
+    const fall = snap.find(n => n.id === id);
+    return fall
+      ? NextResponse.json({ ok: true, item: fall, note: 'db-error-snapshot' })
+      : NextResponse.json({ error: 'Not Found' }, { status: 404 });
   }
 }
 
