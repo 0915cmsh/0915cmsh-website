@@ -6,14 +6,9 @@ import { getBaseUrl } from '@/lib/base-url';
 
 async function getNotices() {
   try {
-    // 프로덕션에서는 절대 URL 사용, 개발에서는 상대 URL 사용
-    const baseUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://www.urbane-cmsh.com' 
-      : 'http://localhost:3000';
+    console.log('🔍 공지사항 목록 조회 시도');
     
-    console.log('🔍 API 호출 URL:', `${baseUrl}/api/notice`);
-    
-    const res = await fetch(`${baseUrl}/api/notice`, { cache: 'no-store' });
+    const res = await fetch('/api/notice', { cache: 'no-store' });
     
     console.log('📡 API 응답 상태:', res.status);
     

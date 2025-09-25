@@ -6,16 +6,23 @@ import { getBaseUrl } from '@/lib/base-url';
 
 async function getItem(id: string) {
   try {
-    // 프로덕션에서는 절대 URL 사용, 개발에서는 상대 URL 사용
-    const baseUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://www.urbane-cmsh.com' 
-      : 'http://localhost:3000';
+    console.log('🔍 개별 공지사항 조회 시도 - ID:', id);
     
-    const res = await fetch(`${baseUrl}/api/notice`, { cache: 'no-store' });
-    if (!res.ok) return null;
+    const res = await fetch(`/api/notice/${id}`, { cache: 'no-store' });
+    
+    if (!res.ok) {
+      console.error('❌ API 호출 실패:', res.status, res.statusText);
+      return null;
+    }
+    
     const data = await res.json();
-    const items = Array.isArray(data) ? data : (data.items ?? []);
-    return items.find((x: any) => String(x.id) === id) ?? null;
+    console.log('📊 API 응답 데이터:', { 
+      ok: data.ok,
+      itemId: data.item?.id,
+      note: data.note || 'none'
+    });
+    
+    return data.ok ? data.item : null;
   } catch (error) {
     console.error('❌ getItem 오류:', error);
     return null;

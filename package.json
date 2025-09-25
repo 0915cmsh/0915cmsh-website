@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "eslint",
     "db:migrate": "prisma migrate deploy",
-    "db:seed": "ts-node prisma/seed.ts"
+    "db:seed": "ts-node prisma/seed.ts",
+    "export:snapshot": "node scripts/export-snapshot.js"
   },
   "dependencies": {
     "@prisma/client": "^6.15.0",
