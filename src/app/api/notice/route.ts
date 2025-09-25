@@ -3,23 +3,23 @@ export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-// 안전한 동적 임포트 (파일 없으면 빈 배열 반환)
-async function getFallback() {
-  try {
-    const mod = await import('@/data/fallback/notices.json');
-    return (mod as any).default ?? [];
-  } catch {
-    return [];
+// ✅ JSON/경로 임포트에 의존하지 않는 인라인 Fallback
+const FALLBACK_ITEMS = [
+  {
+    id: 270,
+    title: 'CMSH 2025년 신규 AI 기반 인재 매칭 서비스 런칭',
+    body: '임시 본문: AI 기반 인재 매칭의 주요 기능 소개(24시간 실시간 매칭, 역량/성향 기반 추천, 채용 리드타임 단축 등).',
+    createdAt: '2025-09-01T00:00:00.000Z',
+    published: true,
   }
-}
+];
 
 export async function GET(req: Request) {
   const debug = new URL(req.url).searchParams.get('debug') === '1';
 
-  // 1) DB URL 자체가 없으면 즉시 fallback
+  // 1) DB URL 자체가 없으면 즉시 Fallback
   if (!process.env.DATABASE_URL) {
-    const fb = await getFallback();
-    return NextResponse.json({ items: fb, total: fb.length, note: 'no-database-url' }, { status: 200 });
+    return NextResponse.json({ items: FALLBACK_ITEMS, total: FALLBACK_ITEMS.length, note: 'no-database-url' }, { status: 200 });
   }
 
   try {
@@ -28,25 +28,20 @@ export async function GET(req: Request) {
       orderBy: { createdAt: 'desc' },
     });
 
-    // 2) DB 연결 OK인데 데이터 0개 + Fallback 모드 켬 → 보정
+    // 2) DB 연결 OK이나 빈 DB → 임시 Fallback 허용(운영상 선택)
     if (process.env.NOTICE_FALLBACK === '1' && items.length === 0) {
-      const fb = await getFallback();
-      return NextResponse.json({ items: fb, total: fb.length, note: 'fallback-empty-db' }, { status: 200 });
+      return NextResponse.json({ items: FALLBACK_ITEMS, total: FALLBACK_ITEMS.length, note: 'fallback-empty-db' }, { status: 200 });
     }
 
     return NextResponse.json({ items, total: items.length });
-  } catch (e: any) {
-    // 3) 에러여도 사용자 화면 빈화면 방지
+  } catch (e:any) {
+    // 3) DB 에러/쿼리 에러 → 화면은 살린다
     if (process.env.NOTICE_FALLBACK === '1') {
-      const fb = await getFallback();
       return NextResponse.json(
-        { items: fb, total: fb.length, note: 'fallback-error', error: debug ? String(e?.message) : undefined },
+        { items: FALLBACK_ITEMS, total: FALLBACK_ITEMS.length, note: 'fallback-error', error: debug ? String(e?.message) : undefined },
         { status: 200 },
       );
     }
-    return NextResponse.json(
-      { items: [], total: 0, error: debug ? String(e?.message) : undefined },
-      { status: 500 },
-    );
+    return NextResponse.json({ items: [], total: 0, error: debug ? String(e?.message) : undefined }, { status: 500 });
   }
 }

@@ -6,6 +6,7 @@ export async function GET() {
   const masked = url ? url.replace(/:\w+@/, '://***@').replace(/(api_key=)[^&]+/, '$1***') : '';
   return NextResponse.json({
     runtime: 'nodejs',
+    vercelEnv: process.env.VERCEL_ENV || 'unknown',    // production | preview | development
     hasDATABASE_URL: !!process.env.DATABASE_URL,
     databaseUrlMasked: masked,
     nodeEnv: process.env.NODE_ENV,
