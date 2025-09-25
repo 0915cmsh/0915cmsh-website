@@ -4,7 +4,7 @@
  */
 
 export const IS_PROD = process.env.VERCEL_ENV === 'production';
-export const READ_MODE = (process.env.READ_MODE ?? 'db') as 'db' | 'snapshot';
+export const READ_MODE = ((process.env.READ_MODE as 'db' | 'snapshot') || 'snapshot');
 export const CAN_USE_DB = !!process.env.DATABASE_URL && READ_MODE === 'db';
 
 /**

@@ -1,8 +1,20 @@
 export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { READ_MODE, CAN_USE_DB } from '@/lib/runtime';
 import noticeSnapshot from '@/fallback/notice.json';
+
+// lazy prisma helper
+type PrismaClientT = typeof import('@prisma/client').PrismaClient;
+let _prisma: PrismaClientT | null = null;
+
+async function getPrisma() {
+  if (_prisma) return _prisma;
+  const mod = await import('@prisma/client');
+  _prisma = new mod.PrismaClient({
+    log: process.env.VERCEL_ENV === 'production' ? ['error'] : ['warn', 'error'],
+  });
+  return _prisma;
+}
 
 type Notice = { 
   id: number; 
@@ -18,54 +30,19 @@ const SNAP = (noticeSnapshot as Notice[]).filter(n => n.published !== false);
 
 export async function GET(_req: Request, { params }: { params: { id: string } }) {
   const id = Number(params.id);
-  
-  console.log('🔍 개별 공지사항 API 호출됨 - ID:', id);
-  console.log('📊 런타임 모드:', READ_MODE);
-  console.log('📊 DB 사용 가능:', CAN_USE_DB);
 
-  // 스냅샷 모드이거나 DB 사용 불가능하면 스냅샷에서 검색
   if (READ_MODE === 'snapshot' || !CAN_USE_DB) {
-    console.log('📸 스냅샷 모드 - 스냅샷에서 검색');
     const item = SNAP.find(n => n.id === id);
-    if (item) {
-      console.log('✅ 스냅샷에서 공지사항 발견');
-      return NextResponse.json({ ok: true, item, note: 'snapshot' });
-    } else {
-      console.log('❌ 스냅샷에서 공지사항을 찾을 수 없음');
-      return NextResponse.json({ error: '공지사항을 찾을 수 없습니다.' }, { status: 404 });
-    }
+    return item ? NextResponse.json({ ok: true, item, note: 'snapshot' }) : NextResponse.json({ error: 'Not Found' }, { status: 404 });
   }
 
   try {
-    console.log('🔍 데이터베이스에서 검색 시도...');
+    const prisma = await getPrisma();
     const item = await prisma.notice.findUnique({ where: { id } });
-    
-    if (item) {
-      console.log('✅ 데이터베이스에서 공지사항 발견');
-      return NextResponse.json({ ok: true, item, note: 'db' });
-    } else {
-      console.log('❌ 데이터베이스에서 공지사항을 찾을 수 없음 - 스냅샷에서 재검색');
-      // DB에서 찾을 수 없으면 스냅샷에서 재검색
-      const fall = SNAP.find(n => n.id === id);
-      if (fall) {
-        console.log('✅ 스냅샷에서 공지사항 발견');
-        return NextResponse.json({ ok: true, item: fall, note: 'db-not-found-snapshot' });
-      } else {
-        console.log('❌ 스냅샷에서도 공지사항을 찾을 수 없음');
-        return NextResponse.json({ error: '공지사항을 찾을 수 없습니다.' }, { status: 404 });
-      }
-    }
+    return item ? NextResponse.json({ ok: true, item, note: 'db' }) : NextResponse.json({ error: 'Not Found' }, { status: 404 });
   } catch (e: any) {
-    console.error('❌ 데이터베이스 오류:', e.message);
-    console.log('⚠️ DB 오류 - 스냅샷에서 재검색');
     const fall = SNAP.find(n => n.id === id);
-    if (fall) {
-      console.log('✅ 스냅샷에서 공지사항 발견');
-      return NextResponse.json({ ok: true, item: fall, note: 'db-error-snapshot' });
-    } else {
-      console.log('❌ 스냅샷에서도 공지사항을 찾을 수 없음');
-      return NextResponse.json({ error: '공지사항을 찾을 수 없습니다.' }, { status: 404 });
-    }
+    return fall ? NextResponse.json({ ok: true, item: fall, note: 'db-error-snapshot', error: String(e?.message || e) }) : NextResponse.json({ error: 'Not Found' }, { status: 404 });
   }
 }
 
