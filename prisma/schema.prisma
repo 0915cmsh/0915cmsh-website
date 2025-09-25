@@ -1,29 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model Notice {
   id        Int      @id @default(autoincrement())
   title     String
-  body      String   @db.Text
-  createdAt DateTime @default(now())
+  content   String
+  author    String   @default("관리자")
   published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime
 }
 
 model Inquiry {
   id        Int      @id @default(autoincrement())
-  type      String   // 'corporate' | 'jobseeker' | 'employee'
-  name      String
-  email     String
-  phone     String
-  company   String?
-  position  String?
+  type      String
   title     String
-  body      String   @db.Text
+  message   String
+  name      String
+  phone     String
+  email     String?
+  password  String?
+  status    String   @default("대기")
   createdAt DateTime @default(now())
+  updatedAt DateTime
+  Reply     Reply[]
+}
+
+model Reply {
+  id        Int      @id @default(autoincrement())
+  inquiryId Int
+  content   String
+  author    String   @default("관리자")
+  createdAt DateTime @default(now())
+  Inquiry   Inquiry  @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
 }
