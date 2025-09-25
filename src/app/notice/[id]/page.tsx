@@ -5,11 +5,21 @@ import Section from '@/components/Section';
 import { getBaseUrl } from '@/lib/base-url';
 
 async function getItem(id: string) {
-  const res = await fetch(`${getBaseUrl()}/api/notice`, { cache: 'no-store' });
-  if (!res.ok) return null;
-  const data = await res.json();
-  const items = Array.isArray(data) ? data : (data.items ?? []);
-  return items.find((x: any) => String(x.id) === id) ?? null;
+  try {
+    // 프로덕션에서는 절대 URL 사용, 개발에서는 상대 URL 사용
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://www.urbane-cmsh.com' 
+      : 'http://localhost:3000';
+    
+    const res = await fetch(`${baseUrl}/api/notice`, { cache: 'no-store' });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const items = Array.isArray(data) ? data : (data.items ?? []);
+    return items.find((x: any) => String(x.id) === id) ?? null;
+  } catch (error) {
+    console.error('❌ getItem 오류:', error);
+    return null;
+  }
 }
 
 export default async function NoticeDetail({ params }: { params: { id: string } }) {

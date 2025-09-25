@@ -5,10 +5,35 @@ import Section from '@/components/Section';
 import { getBaseUrl } from '@/lib/base-url';
 
 async function getNotices() {
-  const res = await fetch(`${getBaseUrl()}/api/notice`, { cache: 'no-store' });
-  if (!res.ok) return [];
-  const data = await res.json();
-  return Array.isArray(data) ? data : (data.items ?? []);
+  try {
+    // 프로덕션에서는 절대 URL 사용, 개발에서는 상대 URL 사용
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://www.urbane-cmsh.com' 
+      : 'http://localhost:3000';
+    
+    console.log('🔍 API 호출 URL:', `${baseUrl}/api/notice`);
+    
+    const res = await fetch(`${baseUrl}/api/notice`, { cache: 'no-store' });
+    
+    console.log('📡 API 응답 상태:', res.status);
+    
+    if (!res.ok) {
+      console.error('❌ API 호출 실패:', res.status, res.statusText);
+      return [];
+    }
+    
+    const data = await res.json();
+    console.log('📊 API 응답 데이터:', { 
+      itemsCount: data.items?.length || 0, 
+      total: data.total || 0,
+      note: data.note || 'none'
+    });
+    
+    return Array.isArray(data) ? data : (data.items ?? []);
+  } catch (error) {
+    console.error('❌ getNotices 오류:', error);
+    return [];
+  }
 }
 
 export default async function NoticePage() {
