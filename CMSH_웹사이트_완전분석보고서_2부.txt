@@ -1,0 +1,890 @@
+================================================================================
+                    CMSH 웹사이트 완전 분석 보고서 (2부)
+                    코드 분석 및 성능 최적화
+================================================================================
+
+================================================================================
+                        4부: 코드 분석 및 성능 최적화
+================================================================================
+
+4.1 프론트엔드 컴포넌트 상세 분석
+==================================
+
+4.1.1 홈페이지 (src/app/page.tsx)
+구현 특징:
+- 서버 컴포넌트 기반 SSR
+- 4개 서비스 카드 그리드 레이아웃
+- 파트너 마퀴 슬라이더
+- 반응형 연락처 섹션
+
+핵심 코드:
+```typescript
+const services = [
+  {
+    title: "파견 서비스",
+    description: "전문 인력을 필요로 하는 기업에 맞춤형 파견 서비스를 제공합니다.",
+    href: "/business/dispatch",
+    icon: "👥"
+  },
+  // ... 3개 추가 서비스
+];
+
+export default function Home() {
+  return (
+    <div>
+      <Hero />
+      <Section className="section-pad">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+          {services.map((service, index) => (
+            <ServiceCard key={index} {...service} />
+          ))}
+        </div>
+      </Section>
+      <PartnerMarquee />
+      {/* 연락처 섹션 */}
+    </div>
+  );
+}
+```
+
+4.1.2 히어로 컴포넌트 (src/components/Hero.tsx)
+구현 특징:
+- Next.js Image 컴포넌트 최적화
+- 반응형 텍스트 크기 조정
+- 배경 오버레이 및 패턴 효과
+- 모바일 최적화 스타일링
+
+핵심 코드:
+```typescript
+export default function Hero() {
+  return (
+    <section className="relative h-[60vh] sm:h-[70vh] hero-mobile">
+      <div className="absolute inset-0">
+        <Image
+          src="/images/hero-background.png"
+          alt="Hero Background"
+          fill
+          className="object-cover brightness-70"
+          priority
+        />
+        <div className="absolute inset-0 bg-black/40"></div>
+      </div>
+      
+      <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="bg-black/60 backdrop-blur-sm rounded-2xl p-4 sm:p-6 md:p-8">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-7xl font-black text-white mb-4">
+            <span>Outsourcing Consulting</span>
+            <span className="block text-blue-200">CMSH</span>
+          </h1>
+          <p className="text-sm sm:text-lg md:text-xl lg:text-2xl text-blue-100 mb-4 sm:mb-6">
+            인재와 현장을 데이터로 연결하는<br/>
+            <strong className="text-white">전문 아웃소싱 파트너</strong>
+          </p>
+        </div>
+        
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+          <Link href="/business" className="btn-primary">
+            서비스 보기
+          </Link>
+          <Link href="/inquiry/board" className="btn-secondary">
+            문의 게시판
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+```
+
+4.1.3 헤더 컴포넌트 (src/components/Header.tsx)
+구현 특징:
+- 반응형 네비게이션 메뉴
+- 모바일 햄버거 메뉴
+- 로고 및 브랜딩
+- 소셜 미디어 링크
+
+핵심 코드:
+```typescript
+export default function Header() {
+  return (
+    <header className="header border-b">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <Link href="/" className="text-xl font-bold">{COMPANY.name}</Link>
+        <nav className="hidden md:flex items-center gap-6 text-lg">
+          <Link href="/" className="group px-3 py-2 !text-black transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
+            홈
+          </Link>
+          <Link href="/about/greeting" className="group px-3 py-2 !text-black transition-all duration-300 hover:text-blue-600 hover:scale-110 hover:font-bold">
+            회사소개
+          </Link>
+          {/* ... 추가 메뉴 항목 */}
+        </nav>
+      </div>
+    </header>
+  );
+}
+```
+
+4.2 API 라우트 상세 분석
+=========================
+
+4.2.1 공지사항 API (src/app/api/notice/route.ts)
+구현 특징:
+- 스냅샷 모드 우선 처리
+- Lazy Prisma Client 로딩
+- 강화된 에러 핸들링
+- 인라인 fallback 데이터
+
+핵심 로직:
+```typescript
+export async function GET(req: Request) {
+  const debug = new URL(req.url).searchParams.get('debug') === '1';
+
+  // 스냅샷 강제 or DB 미가용 → 스냅샷 반환
+  if (READ_MODE === 'snapshot' || !CAN_USE_DB) {
+    const items = loadSnapshot();
+    return NextResponse.json({ items, total: items.length, note: 'snapshot' });
+  }
+
+  try {
+    const prisma = await getPrisma();
+    const items = await prisma.notice.findMany({ 
+      where: { published: true }, 
+      orderBy: { createdAt: 'desc' } 
+    });
+    
+    if (!items.length) {
+      const snap = loadSnapshot();
+      return NextResponse.json({ items: snap, total: snap.length, note: 'empty-db-snapshot' });
+    }
+    
+    return NextResponse.json({ items, total: items.length, note: 'db' });
+  } catch (e: any) {
+    const snap = loadSnapshot();
+    return NextResponse.json(
+      { 
+        items: snap, 
+        total: snap.length, 
+        note: 'db-error-snapshot', 
+        error: debug ? String(e?.message || e) : undefined 
+      },
+      { status: 200 }
+    );
+  }
+}
+```
+
+4.2.2 문의 API (src/app/api/inquiry/route.ts)
+구현 특징:
+- 다양한 문의 유형 지원
+- 답변 상태 관리
+- 스냅샷 모드에서 POST 차단
+- 상세한 샘플 데이터
+
+핵심 로직:
+```typescript
+function loadSnapshot(): Inquiry[] {
+  return [
+    {
+      id: 1,
+      type: "corporate",
+      title: "파견 서비스 문의",
+      message: "안녕하세요. 저희 회사에서 제조업 파견 서비스를 이용하고 싶습니다...",
+      name: "김대표",
+      phone: "010-1234-5678",
+      email: "ceo@company.com",
+      status: "대기",
+      createdAt: "2025-09-20T10:30:00.000Z",
+      Reply: []
+    },
+    // ... 추가 문의 데이터
+  ];
+}
+
+export async function GET() {
+  if (READ_MODE === 'snapshot' || !CAN_USE_DB) {
+    const items = loadSnapshot();
+    return NextResponse.json({ items, total: items.length, note: 'snapshot' });
+  }
+  // ... DB 모드 처리
+}
+```
+
+4.2.3 개별 공지사항 API (src/app/api/notice/[id]/route.ts)
+구현 특징:
+- 동적 라우팅 지원
+- 404 에러 처리
+- 스냅샷 모드에서 CRUD 차단
+- 일관된 응답 형식
+
+핵심 로직:
+```typescript
+export async function GET(_req: Request, { params }: { params: { id: string } }) {
+  const id = Number(params.id);
+
+  if (READ_MODE === 'snapshot' || !CAN_USE_DB) {
+    const snap = loadSnapshot();
+    const item = snap.find(n => n.id === id);
+    return item ? NextResponse.json({ ok: true, item, note: 'snapshot' }) : NextResponse.json({ error: 'Not Found' }, { status: 404 });
+  }
+
+  try {
+    const prisma = await getPrisma();
+    const item = await prisma.notice.findUnique({ where: { id } });
+    return item ? NextResponse.json({ ok: true, item, note: 'db' }) : NextResponse.json({ error: 'Not Found' }, { status: 404 });
+  } catch (e: any) {
+    const snap = loadSnapshot();
+    const fall = snap.find(n => n.id === id);
+    return fall ? NextResponse.json({ ok: true, item: fall, note: 'db-error-snapshot' }) : NextResponse.json({ error: 'Not Found' }, { status: 404 });
+  }
+}
+```
+
+4.3 공지사항 페이지 상세 분석
+==============================
+
+4.3.1 공지사항 목록 페이지 (src/app/notice/page.tsx)
+구현 특징:
+- 서버사이드 렌더링
+- 동적 데이터 fetching
+- FAQ 섹션 포함
+- 반응형 카드 레이아웃
+
+핵심 로직:
+```typescript
+async function getNotices() {
+  try {
+    console.log('🔍 공지사항 목록 조회 시도');
+    
+    const res = await fetch('/api/notice', { cache: 'no-store' });
+    
+    console.log('📡 API 응답 상태:', res.status);
+    
+    if (!res.ok) {
+      console.error('❌ API 호출 실패:', res.status, res.statusText);
+      return [];
+    }
+    
+    const data = await res.json();
+    console.log('📊 API 응답 데이터:', { 
+      itemsCount: data.items?.length || 0, 
+      total: data.total || 0,
+      note: data.note || 'none'
+    });
+    
+    return Array.isArray(data) ? data : (data.items ?? []);
+  } catch (error) {
+    console.error('❌ getNotices 오류:', error);
+    return [];
+  }
+}
+
+export default async function NoticePage() {
+  const items = await getNotices();
+
+  return (
+    <div>
+      {/* 히어로 섹션 */}
+      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
+        <Section>
+          <div className="text-center">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">공지사항</h1>
+            <p className="text-xl text-blue-100">
+              CMSH의 최신 소식과 공지사항을 확인해보세요
+            </p>
+          </div>
+        </Section>
+      </section>
+
+      {/* 공지사항 목록 */}
+      <Section className="py-16">
+        <div className="max-w-4xl mx-auto">
+          {!items.length ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">등록된 공지사항이 없습니다.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {items.map((n: any) => (
+                <div key={n.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 border-l-4 border-blue-600">
+                  <Link href={`/notice/${n.id}`} className="block">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors">
+                        {n.title}
+                      </h3>
+                      <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                        공지
+                      </span>
+                    </div>
+                    <p className="text-gray-600 mb-3 line-clamp-2">{n.content}</p>
+                    <div className="flex justify-between items-center text-sm text-gray-500">
+                      <span>{new Date(n.createdAt).toLocaleDateString('ko-KR')}</span>
+                      <span>작성자: 관리자</span>
+                    </div>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </Section>
+
+      {/* FAQ 섹션 */}
+      <Section className="py-16 bg-gray-50">
+        {/* ... FAQ 내용 */}
+      </Section>
+    </div>
+  );
+}
+```
+
+4.3.2 개별 공지사항 페이지 (src/app/notice/[id]/page.tsx)
+구현 특징:
+- 동적 라우팅
+- 404 에러 처리
+- 마크다운 스타일 콘텐츠
+- 네비게이션 링크
+
+핵심 로직:
+```typescript
+async function getItem(id: string) {
+  try {
+    console.log('🔍 공지사항 상세 조회 시도:', id);
+    
+    const res = await fetch(`/api/notice/${id}`, { cache: 'no-store' });
+    
+    console.log('📡 API 응답 상태:', res.status);
+    
+    if (!res.ok) {
+      console.log('❌ API 호출 실패:', res.status, res.statusText);
+      return null;
+    }
+    
+    const data = await res.json();
+    console.log('📊 API 응답 데이터:', { 
+      ok: data.ok,
+      itemId: data.item?.id,
+      note: data.note || 'none'
+    });
+    
+    return data.ok ? data.item : null;
+  } catch (error) {
+    console.error('❌ getItem 오류:', error);
+    return null;
+  }
+}
+
+export default async function NoticeDetail({ params }: { params: { id: string } }) {
+  const item = await getItem(params.id);
+  
+  if (!item) {
+    return (
+      <div>
+        <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
+          <Section>
+            <div className="text-center">
+              <h1 className="text-4xl md:text-5xl font-bold mb-6">공지사항</h1>
+            </div>
+          </Section>
+        </section>
+        <Section className="py-16">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">존재하지 않는 공지입니다</h2>
+            <p className="text-gray-600 mb-6">요청하신 공지사항을 찾을 수 없습니다.</p>
+            <Link href="/notice" className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              공지사항 목록으로 돌아가기
+            </Link>
+          </div>
+        </Section>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {/* 히어로 섹션 */}
+      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
+        <Section>
+          <div className="text-center">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">공지사항</h1>
+          </div>
+        </Section>
+      </section>
+
+      {/* 공지사항 내용 */}
+      <Section className="py-16">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-lg shadow-lg p-8">
+            <div className="border-b pb-6 mb-8">
+              <h1 className="text-3xl font-bold text-gray-900 mb-4">{item.title}</h1>
+              <div className="flex items-center text-gray-600 text-sm">
+                <span>작성자: {item.author || '관리자'}</span>
+                <span className="mx-2">•</span>
+                <span>{new Date(item.createdAt).toLocaleDateString('ko-KR')}</span>
+              </div>
+            </div>
+            
+            <div className="prose prose-lg max-w-none">
+              <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                {item.content}
+              </div>
+            </div>
+          </div>
+          
+          <div className="mt-8 text-center">
+            <Link href="/notice" className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              ← 공지사항 목록으로 돌아가기
+            </Link>
+          </div>
+        </div>
+      </Section>
+    </div>
+  );
+}
+```
+
+4.4 문의 시스템 상세 분석
+==========================
+
+4.4.1 문의 게시판 (src/app/inquiry/board/page.tsx)
+구현 특징:
+- 클라이언트 사이드 렌더링
+- 페이지네이션 지원
+- 문의 유형별 라벨 표시
+- 답변 상태 표시
+
+핵심 로직:
+```typescript
+export default function InquiryBoard() {
+  const [items, setItems] = useState<Inquiry[]>([]);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const pageSize = 10;
+
+  const getTypeLabel = (type: string) => {
+    const typeMapping: { [key: string]: string } = {
+      'employee': '직원 문의',
+      'corporate': '기업 문의',
+      'jobseeker': '구직자 문의',
+      'dispatch': '파견 문의',
+      'outsourcing': '아웃소싱 문의',
+      'headhunting': '헤드헌팅 문의',
+      'rpo': 'RPO 문의'
+    };
+    return typeMapping[type] || type || '일반';
+  };
+
+  useEffect(() => {
+    fetchInquiries();
+  }, [page]);
+
+  const fetchInquiries = async () => {
+    try {
+      const res = await fetch(`/api/inquiry?page=${page}&pageSize=${pageSize}`, { cache: 'no-store' });
+      const json = await res.json();
+      setItems(json.items);
+      setTotal(json.total);
+    } catch (error) {
+      console.error('Error fetching inquiries:', error);
+    }
+  };
+
+  return (
+    <div>
+      {/* 히어로 섹션 */}
+      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
+        <Section>
+          <div className="text-center">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">문의 게시판</h1>
+            <p className="text-xl text-blue-100">
+              고객님들의 문의사항과 답변을 확인해보세요
+            </p>
+          </div>
+        </Section>
+      </section>
+
+      {/* 문의 목록 */}
+      <Section className="py-16">
+        <div className="max-w-6xl mx-auto">
+          {items.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">등록된 문의가 없습니다.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {items.map((item) => (
+                <div key={item.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.title}</h3>
+                      <p className="text-gray-600 line-clamp-2">{item.message}</p>
+                    </div>
+                    <div className="flex flex-col items-end gap-2">
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        item.status === '답변완료' 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {item.status}
+                      </span>
+                      <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                        {getTypeLabel(item.type)}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-between items-center text-sm text-gray-500 border-t pt-4">
+                    <div className="flex items-center gap-4">
+                      <span>작성자: {item.name}</span>
+                      <span>연락처: {item.phone}</span>
+                    </div>
+                    <span>{new Date(item.createdAt).toLocaleDateString('ko-KR')}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {/* 페이지네이션 */}
+          {total > pageSize && (
+            <div className="mt-8 flex justify-center">
+              <div className="flex gap-2">
+                {Array.from({ length: Math.ceil(total / pageSize) }, (_, i) => (
+                  <button
+                    key={i + 1}
+                    onClick={() => setPage(i + 1)}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                      page === i + 1
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </Section>
+    </div>
+  );
+}
+```
+
+4.4.2 통합 문의 폼 (src/app/inquiry/new/page.tsx)
+구현 특징:
+- 3가지 문의 유형 지원
+- 각 유형별 맞춤 폼 필드
+- 폼 검증 및 제출 처리
+- 성공/실패 상태 관리
+
+핵심 로직:
+```typescript
+function InquiryForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const typeParam = searchParams.get('type') || 'corporate';
+  
+  const typeMapping = {
+    'corporate': '기업',
+    'employee': '재직자',
+    'jobseeker': '구직자'
+  };
+  
+  const [loading, setLoading] = useState(false);
+  const [ok, setOk] = useState(false);
+  const [selectedType, setSelectedType] = useState(typeMapping[typeParam as keyof typeof typeMapping] || '기업');
+  
+  // 각 문의 유형별 폼 데이터
+  const [corporateData, setCorporateData] = useState({
+    companyName: '',
+    contactName: '',
+    position: '',
+    email: '',
+    phone: '',
+    serviceType: '',
+    message: '',
+    password: ''
+  });
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      alert('필수 항목을 모두 입력해주세요.');
+      return;
+    }
+    
+    setLoading(true);
+    
+    try {
+      const formData = getFormData();
+      if (!formData) {
+        alert('문의 유형을 선택해주세요.');
+        return;
+      }
+
+      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.urbane-cmsh.com';
+      const res = await fetch(`${baseUrl}/api/inquiry`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      
+      if (res.ok) {
+        setOk(true);
+        setTimeout(() => {
+          router.push('/inquiry/board');
+        }, 2000);
+      } else {
+        alert('문의 접수에 실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (error) {
+      console.error('Error submitting inquiry:', error);
+      alert('문의 접수 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ... 폼 렌더링 로직
+}
+```
+
+4.5 관리자 시스템 상세 분석
+============================
+
+4.5.1 관리자 대시보드 (src/app/admin/dashboard/page.tsx)
+구현 특징:
+- 문의사항과 공지사항 통합 관리
+- 페이지네이션 지원
+- 탭 기반 UI
+- 통계 카드 표시
+- 스냅샷 모드 안내
+
+핵심 로직:
+```typescript
+export default function AdminDashboard() {
+  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+  const [notices, setNotices] = useState<Notice[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'inquiries' | 'notices'>('inquiries');
+  
+  // 페이지네이션 상태
+  const [inquiryPage, setInquiryPage] = useState(1);
+  const [noticePage, setNoticePage] = useState(1);
+  const [inquiryTotal, setInquiryTotal] = useState(0);
+  const [noticeTotal, setNoticeTotal] = useState(0);
+  const pageSize = 20;
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === 'inquiries') {
+      fetchInquiries();
+    } else {
+      fetchNotices();
+    }
+  }, [inquiryPage, noticePage, activeTab]);
+
+  const fetchData = async () => {
+    try {
+      await Promise.all([fetchInquiries(), fetchNotices()]);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="mb-8">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">CMSH 관리자 대시보드</h1>
+              <p className="text-gray-600 mt-2">문의사항과 공지사항을 관리할 수 있습니다.</p>
+              <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-800">
+                  <strong>현재 스냅샷 모드:</strong> 읽기 전용입니다. 공지사항 수정/삭제를 위해서는 DB 모드로 전환해주세요.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <Link href="/" className="text-blue-600 hover:text-blue-800 font-medium">
+                홈으로
+              </Link>
+              <button className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                로그아웃
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* 통계 카드 */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">전체 문의</p>
+                <p className="text-2xl font-semibold text-gray-900">{inquiryTotal}</p>
+              </div>
+            </div>
+          </div>
+          {/* ... 추가 통계 카드 */}
+        </div>
+
+        {/* 탭 메뉴 */}
+        <div className="bg-white rounded-lg shadow mb-6">
+          <div className="border-b border-gray-200">
+            <nav className="-mb-px flex space-x-8 px-6">
+              <button
+                onClick={() => setActiveTab('inquiries')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'inquiries'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                문의사항
+              </button>
+              <button
+                onClick={() => setActiveTab('notices')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'notices'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                공지사항
+              </button>
+            </nav>
+          </div>
+        </div>
+
+        {/* 콘텐츠 영역 */}
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">로딩 중...</p>
+          </div>
+        ) : (
+          <div className="bg-white rounded-lg shadow">
+            {activeTab === 'inquiries' ? (
+              <div className="p-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">문의사항 목록</h3>
+                {inquiries.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">문의사항이 없습니다.</p>
+                ) : (
+                  <div className="space-y-4">
+                    {inquiries.map((inquiry) => (
+                      <div key={inquiry.id} className="border border-gray-200 rounded-lg p-4">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <h4 className="text-sm font-medium text-gray-900">{inquiry.title}</h4>
+                            <p className="text-sm text-gray-600 mt-1">{inquiry.message}</p>
+                            <div className="mt-2 flex items-center space-x-4 text-xs text-gray-500">
+                              <span>작성자: {inquiry.name}</span>
+                              <span>연락처: {inquiry.phone}</span>
+                              <span>유형: {inquiry.type}</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                              inquiry.status === '답변완료' 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-yellow-100 text-yellow-800'
+                            }`}>
+                              {inquiry.status}
+                            </span>
+                            <Link
+                              href={`/admin/inquiry/${inquiry.id}`}
+                              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                            >
+                              상세보기
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="p-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">공지사항 목록</h3>
+                {notices.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">공지사항이 없습니다.</p>
+                ) : (
+                  <div className="space-y-4">
+                    {notices.map((notice) => (
+                      <div key={notice.id} className="border border-gray-200 rounded-lg p-4">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <h4 className="text-sm font-medium text-gray-900">{notice.title}</h4>
+                            <p className="text-sm text-gray-600 mt-1 line-clamp-2">{notice.content}</p>
+                            <div className="mt-2 flex items-center space-x-4 text-xs text-gray-500">
+                              <span>작성자: {notice.author}</span>
+                              <span>작성일: {new Date(notice.createdAt).toLocaleDateString('ko-KR')}</span>
+                              <span>상태: {notice.published ? '발행' : '임시저장'}</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Link
+                              href={`/admin/notice/${notice.id}`}
+                              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                            >
+                              상세보기
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+4.6 성능 최적화 분석
+====================
+
+4.6.1 이미지 최적화
+- Next.js Image 컴포넌트 사용
+- 자동 WebP 변환
+- 지연 로딩 (lazy loading)
+- 반응형 이미지 크기 조정
+
+4.6.2 코드 분할
+- 동적 import 사용
+- Lazy Prisma Client 로딩
+- 컴포넌트 레벨 코드 분할
+
+4.6.3 캐싱 전략
+- API 라우트에서 cache: 'no-store' 설정
+- 정적 자산 캐싱
+- CDN 활용 (Vercel)
+
+4.6.4 번들 크기 최적화
+- Tree shaking
+- 불필요한 의존성 제거
+- 동적 import로 번들 분할
+
+================================================================================
+                                보고서 2부 끝
+================================================================================
