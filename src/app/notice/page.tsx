@@ -2,13 +2,16 @@ export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
 import Section from '@/components/Section';
-import { getBaseUrl } from '@/lib/base-url';
 
 async function getNotices() {
   try {
     console.log('🔍 공지사항 목록 조회 시도');
     
-    const res = await fetch('/api/notice', { cache: 'no-store' });
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://www.urbane-cmsh.com' 
+      : 'http://localhost:3000';
+    
+    const res = await fetch(`${baseUrl}/api/notice`, { cache: 'no-store' });
     
     console.log('📡 API 응답 상태:', res.status);
     
