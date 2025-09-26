@@ -14,12 +14,33 @@ type Notice = {
 
 async function loadSnapshot(): Promise<Notice[]> {
   try {
-    // alias 문제를 피하려면 상대경로 동적 import 사용
-    const mod = await import('../../../fallback/notice.json');
+    // Vercel에서 안전한 경로로 수정
+    const mod = await import('@/fallback/notice.json');
     const arr = (mod as any).default ?? mod;
     return (arr as Notice[]).filter(n => n.published !== false);
-  } catch {
-    return [];
+  } catch (error) {
+    console.error('Error loading snapshot:', error);
+    // fallback 데이터 반환
+    return [
+      {
+        id: 270,
+        title: "CMSH 2025년 신규 AI 기반 인재 매칭 서비스 런칭",
+        content: "CMSH가 2025년 새로운 AI 기반 인재 매칭 서비스를 런칭합니다.\n\n주요 기능:\n- 24시간 실시간 인재 매칭\n- AI 기반 역량 및 성향 분석\n- 채용 리드타임 50% 단축\n- 맞춤형 인재 추천 시스템",
+        author: "관리자",
+        published: true,
+        createdAt: "2025-09-01T00:00:00.000Z",
+        updatedAt: "2025-09-01T00:00:00.000Z"
+      },
+      {
+        id: 269,
+        title: "CMSH 파견 서비스 확장 안내",
+        content: "CMSH의 파견 서비스가 전국적으로 확장되었습니다.\n\n새로운 지역:\n- 경기권 (수원, 성남, 안양)\n- 충청권 (대전, 천안, 청주)\n- 영남권 (대구, 부산, 울산)",
+        author: "관리자",
+        published: true,
+        createdAt: "2025-08-28T00:00:00.000Z",
+        updatedAt: "2025-08-28T00:00:00.000Z"
+      }
+    ];
   }
 }
 

@@ -14,10 +14,11 @@ type Notice = {
 
 async function loadSnapshot(): Promise<Notice[]> {
   try {
-    const mod = await import('../../../../fallback/notice.json');
+    const mod = await import('@/fallback/notice.json');
     const arr = (mod as any).default ?? mod;
     return (arr as Notice[]).filter(n => n.published !== false);
-  } catch {
+  } catch (error) {
+    console.error('Error loading snapshot:', error);
     return [];
   }
 }

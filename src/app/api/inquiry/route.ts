@@ -17,13 +17,14 @@ type Inquiry = {
 
 async function loadSnapshot(): Promise<Inquiry[]> {
   try {
-    const mod = await import('../../../fallback/inquiry.json');
+    const mod = await import('@/fallback/inquiry.json');
     const arr = (mod as any).default ?? mod;
     return (arr as Inquiry[]).map(x => ({ 
       ...x, 
       status: (x as any)?.Reply?.length ? '답변완료' : '대기' 
     }));
-  } catch {
+  } catch (error) {
+    console.error('Error loading snapshot:', error);
     return [];
   }
 }
