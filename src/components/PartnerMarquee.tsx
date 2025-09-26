@@ -1,4 +1,3 @@
-'use client';
 import Image from 'next/image';
 
 type Partner = { name: string; logo?: string; image?: string };
@@ -35,32 +34,6 @@ export default function PartnerMarquee() {
           </div>
         </div>
       </div>
-      <style jsx>{`
-        @keyframes mar { from { transform: translateX(0) } to { transform: translateX(-50%) } }
-        .partner-chip { 
-          background:#fff; 
-          color:#111; 
-          border-radius:16px; 
-          padding:20px 24px; 
-          display:flex; 
-          align-items:center; 
-          justify-content:center;
-          min-width:180px; 
-          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-          transition: transform 0.3s ease;
-        }
-        .partner-chip:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        }
-        .partner-logo {
-          width: 120px;
-          height: 90px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-      `}</style>
     </section>
   );
 }
