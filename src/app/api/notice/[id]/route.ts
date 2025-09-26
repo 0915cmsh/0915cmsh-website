@@ -64,13 +64,12 @@ function loadSnapshot(): Notice[] {
 }
 
 // lazy prisma helper
-type PrismaClientT = typeof import('@prisma/client').PrismaClient;
-let _prisma: PrismaClientT | null = null;
+import { PrismaClient } from '@prisma/client';
+let _prisma: PrismaClient | null = null;
 
-async function getPrisma() {
+async function getPrisma(): Promise<PrismaClient> {
   if (_prisma) return _prisma;
-  const mod = await import('@prisma/client');
-  _prisma = new mod.PrismaClient({
+  _prisma = new PrismaClient({
     log: process.env.VERCEL_ENV === 'production' ? ['error'] : ['warn', 'error'],
   });
   return _prisma;
@@ -87,6 +86,13 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
 
   try {
     const prisma = await getPrisma();
+    if (!prisma) {
+      const snap = loadSnapshot();
+      const fall = snap.find(n => n.id === id);
+      return fall
+        ? NextResponse.json({ ok: true, item: fall, note: 'db-error-snapshot' })
+        : NextResponse.json({ error: 'Not Found' }, { status: 404 });
+    }
     const item = await prisma.notice.findUnique({ where: { id } });
     return item ? NextResponse.json({ ok: true, item, note: 'db' }) : NextResponse.json({ error: 'Not Found' }, { status: 404 });
   } catch (e: any) {
@@ -111,6 +117,10 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     const id = Number(params.id);
     const body = await req.json();
     const prisma = await getPrisma();
+    
+    if (!prisma) {
+      return NextResponse.json({ error: '데이터베이스 연결에 실패했습니다.' }, { status: 500 });
+    }
     
     const updated = await prisma.notice.update({
       where: { id },
@@ -143,11 +153,17 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
     const id = Number(params.id);
     const prisma = await getPrisma();
     
+    if (!prisma) {
+      return NextResponse.json({ error: '데이터베이스 연결에 실패했습니다.' }, { status: 500 });
+    }
+    
     await prisma.notice.delete({ where: { id } });
     return NextResponse.json({ ok: true });
   } catch (e: any) {
     console.error('Error deleting notice:', e);
-    return NextResponse.json({ error: e?.message || '공지사항 삭제 중 오류가 발생했습니다.' }, { status: 500 });
+    return NextResponse.json(
+      { error: '요청 처리 중 오류가 발생했습니다.' },
+      { status: 500 }
+    );
   }
-}
 }

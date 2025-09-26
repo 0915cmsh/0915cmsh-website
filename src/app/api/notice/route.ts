@@ -64,13 +64,12 @@ function loadSnapshot(): Notice[] {
 }
 
 // lazy prisma helper
-type PrismaClientT = typeof import('@prisma/client').PrismaClient;
-let _prisma: PrismaClientT | null = null;
+import { PrismaClient } from '@prisma/client';
+let _prisma: PrismaClient | null = null;
 
-async function getPrisma() {
+async function getPrisma(): Promise<PrismaClient> {
   if (_prisma) return _prisma;
-  const mod = await import('@prisma/client');
-  _prisma = new mod.PrismaClient({
+  _prisma = new PrismaClient({
     log: process.env.VERCEL_ENV === 'production' ? ['error'] : ['warn', 'error'],
   });
   return _prisma;
@@ -87,16 +86,21 @@ export async function GET(req: Request) {
 
   try {
     const prisma = await getPrisma();
-    const items = await prisma.notice.findMany({ 
-      where: { published: true }, 
-      orderBy: { createdAt: 'desc' } 
-    });
+    if (!prisma) {
+      const snap = loadSnapshot();
+      return NextResponse.json({ items: snap, total: snap.length, note: 'db-error-snapshot' });
+    }
     
+    const items = await prisma.notice.findMany({
+      where: { published: true },
+      orderBy: { createdAt: 'desc' }
+    });
+
     if (!items.length) {
       const snap = loadSnapshot();
       return NextResponse.json({ items: snap, total: snap.length, note: 'empty-db-snapshot' });
     }
-    
+
     return NextResponse.json({ items, total: items.length, note: 'db' });
   } catch (e: any) {
     const snap = loadSnapshot();
@@ -123,8 +127,12 @@ export async function POST(req: Request) {
 
   try {
     const prisma = await getPrisma();
-    const body = await req.json();
+    if (!prisma) {
+      return NextResponse.json({ error: '데이터베이스 연결에 실패했습니다.' }, { status: 500 });
+    }
     
+    const body = await req.json();
+
     const newNotice = await prisma.notice.create({
       data: {
         title: body.title,
