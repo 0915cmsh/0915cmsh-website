@@ -221,6 +221,11 @@ export default function AdminDashboard() {
             <div>
               <h1 className="text-3xl font-bold text-gray-900">CMSH 관리자 대시보드</h1>
               <p className="text-gray-600 mt-2">문의사항과 공지사항을 관리할 수 있습니다.</p>
+              <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-800">
+                  <strong>현재 스냅샷 모드:</strong> 읽기 전용입니다. 공지사항 수정/삭제를 위해서는 DB 모드로 전환해주세요.
+                </p>
+              </div>
             </div>
             <div className="flex gap-4">
               <Link

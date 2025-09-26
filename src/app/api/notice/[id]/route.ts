@@ -57,10 +57,19 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
   }
 }
 
+// PUT - 공지사항 수정
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
+  if (READ_MODE === 'snapshot' || !CAN_USE_DB) {
+    return NextResponse.json({ 
+      error: '현재 스냅샷 모드입니다. 공지사항 수정을 위해서는 DB 모드로 전환해주세요.',
+      contact: 'hj.kim@urbane-gp.com'
+    }, { status: 503 });
+  }
+
   try {
     const id = Number(params.id);
     const body = await req.json();
+    const prisma = await getPrisma();
     
     const updated = await prisma.notice.update({
       where: { id },
@@ -72,21 +81,32 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
         updatedAt: new Date(),
       },
     });
+
     return NextResponse.json({ ok: true, item: updated });
-  } catch (e) {
+  } catch (e: any) {
     console.error('Error updating notice:', e);
-    return NextResponse.json({ error: '공지사항 수정 중 오류가 발생했습니다.' }, { status: 500 });
+    return NextResponse.json({ error: e?.message || '공지사항 수정 중 오류가 발생했습니다.' }, { status: 500 });
   }
 }
 
+// DELETE - 공지사항 삭제
 export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+  if (READ_MODE === 'snapshot' || !CAN_USE_DB) {
+    return NextResponse.json({ 
+      error: '현재 스냅샷 모드입니다. 공지사항 삭제를 위해서는 DB 모드로 전환해주세요.',
+      contact: 'hj.kim@urbane-gp.com'
+    }, { status: 503 });
+  }
+
   try {
     const id = Number(params.id);
+    const prisma = await getPrisma();
     
     await prisma.notice.delete({ where: { id } });
     return NextResponse.json({ ok: true });
-  } catch (e) {
+  } catch (e: any) {
     console.error('Error deleting notice:', e);
-    return NextResponse.json({ error: '공지사항 삭제 중 오류가 발생했습니다.' }, { status: 500 });
+    return NextResponse.json({ error: e?.message || '공지사항 삭제 중 오류가 발생했습니다.' }, { status: 500 });
   }
+}
 }

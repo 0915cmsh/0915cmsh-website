@@ -71,3 +71,32 @@ export async function GET(req: Request) {
     );
   }
 }
+
+// POST - 새 공지사항 작성
+export async function POST(req: Request) {
+  if (READ_MODE === 'snapshot' || !CAN_USE_DB) {
+    return NextResponse.json({ 
+      error: '현재 스냅샷 모드입니다. 공지사항 작성을 위해서는 DB 모드로 전환해주세요.',
+      contact: 'hj.kim@urbane-gp.com'
+    }, { status: 503 });
+  }
+
+  try {
+    const prisma = await getPrisma();
+    const body = await req.json();
+    
+    const newNotice = await prisma.notice.create({
+      data: {
+        title: body.title,
+        content: body.content,
+        author: body.author || '관리자',
+        published: body.published ?? true,
+      },
+    });
+
+    return NextResponse.json(newNotice, { status: 201 });
+  } catch (e: any) {
+    console.error('Error creating notice:', e);
+    return NextResponse.json({ error: e?.message || '공지사항 작성 중 오류가 발생했습니다.' }, { status: 500 });
+  }
+}
